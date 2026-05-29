@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dexium · Post Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --d-navy: #0B1F3A;
+  --d-navy2: #0f2847;
+  --d-navy3: #162f52;
+  --d-blue: #1a5fb4;
+  --d-blue2: #2471d1;
+  --d-cyan: #3B8BFF;
+  --d-cyan2: #5fa3ff;
+  --d-white: #ffffff;
+  --d-off: #f0f4fb;
+  --d-muted: #7d93b0;
+  --d-border: rgba(255,255,255,0.07);
+  --d-borderl: rgba(255,255,255,0.13);
+  --d-green: #00d4a0;
+  --d-green2: rgba(0,212,160,0.1);
+  --d-amber: #f59e0b;
+  --d-amber2: rgba(245,158,11,0.1);
+  --d-red: #ff5c5c;
+  --d-red2: rgba(255,92,92,0.1);
+  --d-purple: #8b7cf8;
+  --d-purple2: rgba(139,124,248,0.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--d-navy);
+  color: var(--d-white);
+  min-height: 100vh;
+  line-height: 1.55;
+}
+
+/* ═══ HEADER ═══ */
+.hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 0.5px solid var(--d-border);
+  background: var(--d-navy);
+  position: sticky; top: 0; z-index: 50;
+}
+.hdr-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--d-blue) 0%, var(--d-cyan) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700; color: white;
+  letter-spacing: -0.5px;
+}
+.logo-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px; font-weight: 600;
+  color: var(--d-white); letter-spacing: -0.3px;
+}
+.logo-badge {
+  background: rgba(59,139,255,0.15);
+  border: 0.5px solid rgba(59,139,255,0.3);
+  color: var(--d-cyan); font-size: 10px;
+  padding: 2px 7px; border-radius: 4px;
+  font-weight: 500; letter-spacing: 0.03em;
+}
+.hdr-tagline { font-size: 11px; color: var(--d-muted); }
+
+/* ═══ LAYOUT ═══ */
+.layout {
+  display: grid;
+  grid-template-columns: 380px 1fr 340px;
+  min-height: calc(100vh - 53px);
+}
+
+/* ═══ PANELS ═══ */
+.panel {
+  overflow-y: auto;
+  padding: 20px 22px;
+  border-right: 0.5px solid var(--d-border);
+}
+.panel:last-child { border-right: none; }
+.panel-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--d-muted); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 7px;
+}
+.panel-title::before {
+  content: ''; width: 2px; height: 12px;
+  background: var(--d-cyan); border-radius: 1px;
+}
+.block { margin-bottom: 20px; }
+.block-label {
+  font-size: 11px; color: var(--d-muted);
+  margin-bottom: 6px; font-weight: 500;
+}
+
+/* ═══ PILLS ═══ */
+.pills { display: flex; flex-wrap: wrap; gap: 5px; }
+.pill {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--d-borderl);
+  border-radius: 6px; padding: 4px 11px;
+  font-size: 11px; color: var(--d-muted);
+  cursor: pointer; transition: all .15s; user-select: none;
+}
+.pill:hover { border-color: var(--d-cyan); color: var(--d-white); }
+.pill.on { background: rgba(59,139,255,0.12); border-color: var(--d-cyan); color: var(--d-cyan); font-weight: 500; }
+
+/* ═══ INPUTS ═══ */
+.inp, .ta, .sel {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--d-borderl);
+  border-radius: 7px;
+  padding: 8px 12px;
+  color: var(--d-white);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  outline: none;
+  transition: border-color .15s;
+  resize: none;
+}
+.inp:focus, .ta:focus, .sel:focus {
+  border-color: var(--d-cyan);
+  background: rgba(59,139,255,0.05);
+}
+.inp::placeholder, .ta::placeholder { color: rgba(255,255,255,0.2); }
+.sel { appearance: none; cursor: pointer; }
+.sel option { background: var(--d-navy2); }
+.cw { position: relative; }
+.cc {
+  position: absolute; bottom: 8px; right: 10px;
+  font-size: 10px; color: var(--d-muted); pointer-events: none;
+}
+.cc.w { color: var(--d-amber); }
+.cc.o { color: var(--d-red); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.note {
+  font-size: 10px; color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.02);
+  border-radius: 5px; padding: 6px 10px;
+  margin-top: 6px; line-height: 1.6;
+}
+.note b { color: rgba(255,255,255,0.4); }
+
+/* ═══ BUTTONS ═══ */
+.btn-main {
+  width: 100%; background: var(--d-cyan);
+  color: white; border: none; border-radius: 8px;
+  padding: 10px 18px; font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-main:hover { background: var(--d-cyan2); transform: translateY(-1px); }
+.btn-main:disabled { background: rgba(59,139,255,0.25); cursor: not-allowed; transform: none; }
+.btn-ghost {
+  width: 100%; background: transparent;
+  border: 0.5px solid var(--d-borderl);
+  border-radius: 7px; padding: 8px;
+  color: var(--d-muted); font-family: 'Inter', sans-serif;
+  font-size: 11px; cursor: pointer; transition: all .15s;
+}
+.btn-ghost:hover { border-color: var(--d-cyan); color: var(--d-white); }
+.btn-ai {
+  width: 100%; background: rgba(139,124,248,0.08);
+  border: 0.5px solid rgba(139,124,248,0.25);
+  border-radius: 7px; padding: 8px 12px;
+  color: var(--d-purple); font-family: 'Inter', sans-serif;
+  font-size: 11px; cursor: pointer; transition: all .15s;
+  text-align: left; display: flex; align-items: center; gap: 7px;
+}
+.btn-ai:hover { background: rgba(139,124,248,0.14); }
+.btn-ai:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ═══ AI RESEARCH ═══ */
+.research-box {
+  background: rgba(59,139,255,0.04);
+  border: 0.5px solid rgba(59,139,255,0.18);
+  border-radius: 9px; padding: 12px 14px;
+}
+.rbox-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.rbox-title {
+  font-size: 11px; font-weight: 500;
+  color: var(--d-cyan); display: flex; align-items: center; gap: 5px;
+}
+.btn-search {
+  background: var(--d-cyan); color: white;
+  border: none; border-radius: 5px;
+  padding: 4px 11px; font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 4px;
+}
+.btn-search:hover { background: var(--d-cyan2); }
+.btn-search:disabled { background: rgba(59,139,255,0.25); cursor: not-allowed; }
+.rbox-sub { font-size: 10px; color: var(--d-muted); line-height: 1.5; }
+.rbox-results { margin-top: 12px; }
+.src-card {
+  background: rgba(255,255,255,0.02);
+  border: 0.5px solid var(--d-border);
+  border-radius: 7px; padding: 9px 11px;
+  margin-bottom: 7px; cursor: pointer; transition: all .15s;
+}
+.src-card:hover { border-color: var(--d-cyan); background: rgba(59,139,255,0.04); }
+.src-card.used { border-color: var(--d-green); background: var(--d-green2); }
+.src-tag {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 7px;
+  border-radius: 4px; background: rgba(59,139,255,0.12);
+  color: var(--d-cyan); display: inline-block; margin-bottom: 5px;
+}
+.src-title { font-size: 12px; font-weight: 500; color: var(--d-white); line-height: 1.35; margin-bottom: 2px; }
+.src-meta { font-size: 10px; color: var(--d-muted); }
+.src-hook { font-size: 10px; color: var(--d-green); margin-top: 4px; font-weight: 500; line-height: 1.4; }
+.src-btn { font-size: 10px; color: var(--d-cyan); background: none; border: none; cursor: pointer; padding: 0; margin-top: 4px; font-family: 'Inter', sans-serif; }
+.src-btn:hover { text-decoration: underline; }
+.angle-card {
+  background: rgba(139,124,248,0.04);
+  border: 0.5px solid rgba(139,124,248,0.18);
+  border-radius: 7px; padding: 9px 11px;
+  margin-bottom: 7px; cursor: pointer; transition: all .15s;
+}
+.angle-card:hover { border-color: var(--d-purple); }
+.angle-card.used { border-color: var(--d-green); background: var(--d-green2); }
+.angle-title { font-size: 11px; font-weight: 600; color: var(--d-white); margin-bottom: 3px; }
+.angle-hook { font-size: 10px; color: rgba(255,255,255,0.45); font-style: italic; line-height: 1.45; }
+.angle-btn { font-size: 10px; color: var(--d-purple); background: none; border: none; cursor: pointer; padding: 0; margin-top: 4px; font-family: 'Inter', sans-serif; }
+.ai-draft {
+  background: rgba(255,255,255,0.02); border: 0.5px solid var(--d-border);
+  border-radius: 7px; padding: 10px 12px; font-size: 11px;
+  color: rgba(255,255,255,0.7); line-height: 1.7;
+  white-space: pre-wrap; margin-top: 8px; display: none;
+}
+.sec-divider { height: 0.5px; background: var(--d-border); margin: 12px 0; }
+.sec-mini {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--d-muted); margin-bottom: 8px;
+}
+
+/* ═══ MIDDLE — POST PREVIEW ═══ */
+.mid { background: var(--d-navy2); padding: 22px; overflow-y: auto; }
+.tab-bar {
+  display: flex; border-bottom: 0.5px solid var(--d-border);
+  margin-bottom: 18px;
+}
+.tab {
+  padding: 8px 14px; font-size: 11px; color: var(--d-muted);
+  cursor: pointer; transition: all .15s;
+  border-bottom: 2px solid transparent; font-weight: 500;
+}
+.tab:hover { color: var(--d-white); }
+.tab.on { color: var(--d-cyan); border-bottom-color: var(--d-cyan); }
+.tab-content { display: none; }
+.tab-content.on { display: block; }
+
+/* LI CARD MOCKUP */
+.li-post {
+  background: var(--d-navy);
+  border: 0.5px solid var(--d-borderl);
+  border-radius: 10px; padding: 16px 18px;
+  margin-bottom: 10px;
+}
+.li-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.li-av {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--d-blue) 0%, var(--d-cyan) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.li-name { font-size: 13px; font-weight: 600; color: var(--d-white); }
+.li-sub { font-size: 11px; color: var(--d-muted); }
+.li-body {
+  font-size: 13px; line-height: 1.75;
+  color: rgba(255,255,255,0.8);
+  white-space: pre-wrap; word-break: break-word;
+}
+.li-body .h1 { font-weight: 600; color: var(--d-white); }
+.li-body .htag { color: var(--d-cyan); font-size: 12px; }
+.li-body .hq { color: rgba(255,255,255,0.5); font-style: italic; }
+.li-body .hsrc { color: var(--d-muted); font-size: 11px; }
+.li-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 14px; padding-top: 10px;
+  border-top: 0.5px solid var(--d-border);
+}
+.li-stats { font-size: 11px; color: var(--d-muted); display: flex; gap: 14px; }
+.li-copy {
+  background: var(--d-green); color: var(--d-navy);
+  border: none; border-radius: 5px; padding: 5px 13px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px;
+  font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.li-copy:hover { background: #00ebb1; }
+.li-copy.done { background: var(--d-cyan); color: white; }
+.li-empty {
+  text-align: center; padding: 48px 20px;
+  color: var(--d-muted); font-size: 13px; line-height: 1.8;
+}
+
+/* SCORE */
+.score-wrap { }
+.score-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.score-big { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; }
+.score-lbl { font-size: 11px; color: var(--d-muted); }
+.score-bar {
+  width: 100%; height: 4px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px; overflow: hidden; margin-bottom: 18px;
+}
+.score-fill { height: 100%; border-radius: 2px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+.crit { display: flex; flex-direction: column; gap: 5px; }
+.crit-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 6px;
+  background: rgba(255,255,255,0.025); font-size: 11px;
+}
+.crit-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.crit-txt { flex: 1; color: rgba(255,255,255,0.65); }
+.crit-fix { font-size: 10px; color: var(--d-muted); padding: 2px 8px 7px 22px; line-height: 1.5; }
+
+/* HISTORY */
+.hist-grid { display: flex; flex-direction: column; gap: 8px; }
+.hist-card {
+  background: rgba(255,255,255,0.025);
+  border: 0.5px solid var(--d-border);
+  border-radius: 8px; padding: 10px 12px;
+  cursor: pointer; transition: all .15s;
+}
+.hist-card:hover { border-color: var(--d-cyan); background: rgba(59,139,255,0.04); }
+.hist-card.best { border-color: rgba(0,212,160,0.3); background: rgba(0,212,160,0.03); }
+.hist-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.hist-date { font-size: 10px; color: var(--d-muted); }
+.hist-imp {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 700;
+}
+.hist-title { font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 5px; }
+.hist-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+.hist-pill {
+  font-size: 9px; padding: 1px 6px; border-radius: 4px;
+  font-weight: 500;
+}
+.hist-reuse { font-size: 10px; color: var(--d-cyan); background: none; border: none; cursor: pointer; padding: 0; margin-top: 5px; font-family: 'Inter', sans-serif; }
+
+/* ═══ SOURCE COMMENT + CEO REPOST ═══ */
+.publish-block {
+  background: rgba(255,255,255,0.02);
+  border: 0.5px solid var(--d-borderl);
+  border-radius: 9px; padding: 13px 15px;
+  margin-top: 10px;
+}
+.publish-block-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.07em;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.publish-body {
+  font-size: 12px; line-height: 1.65;
+  color: rgba(255,255,255,0.75);
+  white-space: pre-wrap; word-break: break-word;
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px; padding: 10px 12px;
+  margin-bottom: 8px; min-height: 36px;
+}
+.publish-footer { display: flex; align-items: center; justify-content: space-between; }
+.publish-hint { font-size: 10px; color: var(--d-muted); }
+.pub-copy-btn {
+  background: transparent; border: 0.5px solid var(--d-borderl);
+  border-radius: 5px; padding: 4px 11px;
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  color: var(--d-muted); cursor: pointer; transition: all .15s;
+}
+.pub-copy-btn:hover { border-color: var(--d-cyan); color: var(--d-white); }
+.pub-copy-btn.done { border-color: var(--d-green); color: var(--d-green); }
+.ceo-block {
+  background: rgba(139,124,248,0.05);
+  border: 0.5px solid rgba(139,124,248,0.2);
+  border-radius: 9px; padding: 13px 15px;
+  margin-top: 10px;
+}
+.ceo-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ceo-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(139,124,248,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--d-purple); flex-shrink: 0;
+}
+.ceo-name { font-size: 12px; font-weight: 500; color: var(--d-white); }
+.ceo-sub { font-size: 10px; color: var(--d-muted); }
+.ceo-body {
+  font-size: 12px; line-height: 1.65;
+  color: rgba(255,255,255,0.75);
+  white-space: pre-wrap; word-break: break-word;
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px; padding: 10px 12px;
+  margin-bottom: 8px; min-height: 36px;
+}
+.ceo-footer { display: flex; align-items: center; justify-content: space-between; }
+.ceo-hint { font-size: 10px; color: var(--d-muted); line-height: 1.5; max-width: 200px; }
+.btn-gen-ceo {
+  background: rgba(139,124,248,0.1);
+  border: 0.5px solid rgba(139,124,248,0.3);
+  border-radius: 6px; padding: 5px 12px;
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  color: var(--d-purple); cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn-gen-ceo:hover { background: rgba(139,124,248,0.18); }
+.btn-gen-ceo:disabled { opacity: .4; cursor: not-allowed; }
+.hist-insight {
+  background: rgba(0,212,160,0.06);
+  border: 0.5px solid rgba(0,212,160,0.15);
+  border-radius: 7px; padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.hi-title { font-size: 11px; font-weight: 600; color: var(--d-green); margin-bottom: 3px; }
+.hi-body { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+/* ═══ RIGHT — STRATEGY ═══ */
+.right { background: var(--d-navy3); overflow-y: auto; padding: 20px 20px; }
+.tip-card {
+  background: rgba(255,255,255,0.025);
+  border: 0.5px solid var(--d-border);
+  border-radius: 8px; padding: 11px 13px;
+  margin-bottom: 8px;
+}
+.tip-tag {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 7px;
+  border-radius: 4px; display: inline-block; margin-bottom: 7px;
+}
+.tt-algo { background: rgba(59,139,255,0.12); color: var(--d-cyan); }
+.tt-copy { background: rgba(0,212,160,0.1); color: var(--d-green); }
+.tt-time { background: rgba(245,158,11,0.1); color: var(--d-amber); }
+.tt-no { background: rgba(255,92,92,0.1); color: var(--d-red); }
+.tt-data { background: rgba(139,124,248,0.1); color: var(--d-purple); }
+.tip-title { font-size: 12px; font-weight: 600; color: var(--d-white); margin-bottom: 3px; }
+.tip-body { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+.tip-ex {
+  margin-top: 7px; padding: 6px 10px;
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid var(--d-cyan);
+  border-radius: 0 5px 5px 0;
+  font-size: 10px; color: rgba(255,255,255,0.35);
+  font-style: italic; line-height: 1.5;
+}
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+.kpi {
+  background: rgba(255,255,255,0.03);
+  border-radius: 7px; padding: 10px 12px;
+}
+.kpi-lbl { font-size: 10px; color: var(--d-muted); margin-bottom: 2px; }
+.kpi-now { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; color: var(--d-white); }
+.kpi-target { font-size: 10px; color: var(--d-green); margin-top: 1px; }
+
+/* LOADING */
+.dots span {
+  display: inline-block; width: 4px; height: 4px;
+  border-radius: 50%; background: var(--d-cyan);
+  animation: blink 1s infinite;
+}
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,80%,100%{opacity:.15;transform:scale(.7)} 40%{opacity:1;transform:scale(1)} }
+.fade { animation: fadeUp .28s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">
+    <div class="logo-mark">dx</div>
+    <span class="logo-text">dexium</span>
+    <span class="logo-badge">Post Builder</span>
+  </div>
+  <span class="hdr-tagline">Notre métier, c'est votre informatique · dexium.ch · Bussigny, Vaud</span>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- ══ LEFT: INPUTS ══ -->
+<div class="panel" id="leftPanel">
+  <div class="panel-title">Construire le post</div>
+
+  <!-- SERVICE dexium -->
+  <div class="block">
+    <div class="block-label">Service dexium</div>
+    <div class="pills" id="pgService">
+      <div class="pill on" data-v="managed">Managed Services 360°</div>
+      <div class="pill" data-v="cloud">Cloud Computing</div>
+      <div class="pill" data-v="workplace">Modern Workplace</div>
+      <div class="pill" data-v="cyber">Cyber Security</div>
+      <div class="pill" data-v="ai">Intelligence Artificielle</div>
+      <div class="pill" data-v="visio">Visioconférence</div>
+      <div class="pill" data-v="ged">GED</div>
+      <div class="pill" data-v="partner">Partenaire / Terrain</div>
+    </div>
+  </div>
+
+  <!-- FORMAT -->
+  <div class="block">
+    <div class="block-label">Format</div>
+    <div class="pills" id="pgFormat">
+      <div class="pill on" data-v="texte">Texte long</div>
+      <div class="pill" data-v="position">Prise de position</div>
+      <div class="pill" data-v="question">Question ouverte</div>
+      <div class="pill" data-v="pedago">Pédagogique</div>
+      <div class="pill" data-v="coulisses">Dans les coulisses</div>
+      <div class="pill" data-v="chiffre">Stat / Chiffre clé</div>
+    </div>
+  </div>
+
+  <!-- AI RESEARCH -->
+  <div class="block">
+    <div class="research-box">
+      <div class="rbox-hdr">
+        <span class="rbox-title">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6" cy="6" r="5" stroke="#3B8BFF" stroke-width="1.2"/><path d="M6 3.5v3l1.5 1.5" stroke="#3B8BFF" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Recherche IA — sources & trends
+        </span>
+        <button class="btn-search" id="btnSearch" onclick="doSearch()">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="4.5" cy="4.5" r="3" stroke="white" stroke-width="1.1"/><path d="M7 7l2.5 2.5" stroke="white" stroke-width="1.1" stroke-linecap="round"/></svg>
+          Rechercher
+        </button>
+      </div>
+      <div class="rbox-sub">Actualités fraîches + chiffres réels selon le service sélectionné.</div>
+      <div class="rbox-results" id="rboxResults"></div>
+    </div>
+  </div>
+
+  <!-- AI DRAFT -->
+  <div class="block">
+    <button class="btn-ai" id="btnAI" onclick="doAIDraft()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 4H13l-3.5 2.5 1.3 4L7 9l-3.8 2.5 1.3-4L1 5h4.5L7 1z" stroke="#8b7cf8" stroke-width="1.1" stroke-linejoin="round"/></svg>
+      Générer un brouillon IA complet
+    </button>
+    <div class="ai-draft fade" id="aiDraft"></div>
+  </div>
+
+  <!-- ACCROCHE -->
+  <div class="block">
+    <div class="block-label">Accroche — 1ère ligne</div>
+    <div class="cw">
+      <textarea class="ta" id="hook" rows="2" placeholder="Ex: 64% des PME romandes n'ont pas de plan de continuité IT documenté." style="padding-right:50px"></textarea>
+      <span class="cc" id="ccHook">0/120</span>
+    </div>
+    <div class="note"><b>Règle n°1 :</b> Chiffre réel ou déclaration brutale. L'algo LinkedIn montre l'accroche même quand le post est réduit.</div>
+  </div>
+
+  <!-- CORPS -->
+  <div class="block">
+    <div class="block-label">Corps du message</div>
+    <div class="cw">
+      <textarea class="ta" id="body" rows="6" placeholder="Contexte sourcé · 3 points concrets · angle dexium conciergerie IT..."></textarea>
+      <span class="cc" id="ccBody">0/1300</span>
+    </div>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="block">
+    <div class="block-label">Question de clôture</div>
+    <input class="inp" type="text" id="question" placeholder="Ex: Dans votre entreprise, qui s'en occupe — et sous quel délai ?" />
+    <div class="note"><b>Indispensable :</b> Une question oui/non ou avec un chiffre génère 3× plus de commentaires.</div>
+  </div>
+
+  <!-- HASHTAGS + SOURCE -->
+  <div class="row2" style="margin-bottom:12px">
+    <div>
+      <div class="block-label">Hashtags (3–5)</div>
+      <input class="inp" type="text" id="hashtags" value="#PMESuisse #ManagedIT #ConciergerieIT #ITRomandie" />
+    </div>
+    <div>
+      <div class="block-label">Heure de pub</div>
+      <select class="sel" id="pubTime">
+        <option value="745l">Lundi 7h45 ✓</option>
+        <option value="745j">Jeudi 7h45 ✓</option>
+        <option value="1200">Midi</option>
+        <option value="1730">17h30</option>
+        <option value="autre">Autre</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-label">Source (ira en commentaire)</div>
+    <input class="inp" type="text" id="source" placeholder="Ex: Source : OFCS rapport 2025 · ofcs.admin.ch" />
+  </div>
+
+  <div style="margin-top:6px">
+    <button class="btn-main" onclick="doPreview()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Générer aperçu + score
+    </button>
+    <button class="btn-ghost" style="margin-top:6px" onclick="doReset()">Réinitialiser</button>
+  </div>
+</div>
+
+<!-- ══ MIDDLE: PREVIEW ══ -->
+<div class="mid">
+  <div class="tab-bar">
+    <div class="tab on" onclick="showTab('preview',this)">Aperçu LinkedIn</div>
+    <div class="tab" onclick="showTab('score',this)">Score algo</div>
+    <div class="tab" onclick="showTab('history',this)">Historique & insights</div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="tab-content on" id="tab-preview">
+    <div id="previewArea">
+      <div class="li-empty">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" style="opacity:.2;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto"><rect x="4" y="8" width="36" height="28" rx="5" stroke="white" stroke-width="1.5"/><path d="M13 18h18M13 25h12" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Sélectionne un service, clique <strong>Rechercher</strong><br>pour les sources fraîches, puis <strong>Générer</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORE -->
+  <div class="tab-content" id="tab-score">
+    <div id="scoreArea">
+      <div class="li-empty">Génère d'abord un post pour voir le score algorithmique.</div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="tab-content" id="tab-history">
+    <div id="histArea"></div>
+  </div>
+</div>
+
+<!-- ══ RIGHT: STRATEGY ══ -->
+<div class="right">
+  <div class="panel-title" style="margin-bottom:16px">Stratégie & conseils</div>
+
+  <!-- KPI -->
+  <div class="block">
+    <div class="block-label" style="margin-bottom:8px">Objectifs — maintenant → 8 semaines</div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-lbl">Impressions/post</div><div class="kpi-now">14</div><div class="kpi-target">→ 80+ objectif</div></div>
+      <div class="kpi"><div class="kpi-lbl">Commentaires/post</div><div class="kpi-now">0</div><div class="kpi-target">→ 3+ objectif</div></div>
+      <div class="kpi"><div class="kpi-lbl">DM entrants/mois</div><div class="kpi-now">0</div><div class="kpi-target">→ 2+ objectif</div></div>
+      <div class="kpi"><div class="kpi-lbl">Connexions C-level</div><div class="kpi-now">~5/sem</div><div class="kpi-target">→ 10+/sem</div></div>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+  <div class="block-label" style="margin-bottom:10px">12 règles fondées sur tes données</div>
+  <div id="tipsArea"></div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+const S = {
+  service: 'managed', format: 'texte',
+  sources: [], angles: [], generated: false, postText: '',
+  sourceUrl: '', ceoText: ''
+};
+
+// ═══════════════════════════════
+// PILL GROUPS
+// ═══════════════════════════════
+function initPills(gid, key) {
+  document.getElementById(gid).querySelectorAll('.pill').forEach(p => {
+    p.onclick = () => {
+      document.getElementById(gid).querySelectorAll('.pill').forEach(x => x.classList.remove('on'));
+      p.classList.add('on');
+      S[key] = p.dataset.v;
+      // reset search results when service changes
+      if (key === 'service') {
+        document.getElementById('rboxResults').innerHTML = '';
+        S.sources = []; S.angles = [];
+      }
+    };
+  });
+}
+initPills('pgService', 'service');
+initPills('pgFormat', 'format');
+
+// ═══════════════════════════════
+// CHAR COUNTERS
+// ═══════════════════════════════
+function cc(fid, cid, max) {
+  const f = document.getElementById(fid), c = document.getElementById(cid);
+  f.oninput = () => {
+    const n = f.value.length;
+    c.textContent = n + '/' + max;
+    c.className = 'cc' + (n > max ? ' o' : n > max * .85 ? ' w' : '');
+  };
+}
+cc('hook','ccHook',120);
+cc('body','ccBody',1300);
+
+// ═══════════════════════════════
+// SERVICE CONFIG — dexium brand + historical data
+// ═══════════════════════════════
+const CFG = {
+  managed: {
+    label: 'Managed Services 360°',
+    slogan: 'Pérennisons votre IT ensemble !',
+    query: 'managed services PME Suisse coût panne IT infrastructure 2026',
+    hashtags: '#PMESuisse #ManagedIT #ConciergerieIT #ITRomandie',
+    bestPost: { date: '30 avr.', imp: 147, eng: '9%', label: 'Partenaire Roomz — contenu nommé concret' },
+    staticSrc: [
+      { tag: 'Chiffre clé', title: 'Panne IT = 5 000–15 000 CHF pour une PME suisse', meta: 'bacata.net · mai 2026', hook: 'Une heure d\'arrêt coûte 1 600 CHF à une PME de 20 collaborateurs. Une panne majeure : jusqu\'à 15 000 CHF.' },
+      { tag: 'La Mobilière', title: '8 PME suisses sur 10 font appel à un prestataire IT externe', meta: 'La Mobilière / bacata.net · 2026', hook: '80% des PME suisses externalisent déjà leur IT. La vraie différence : la qualité du contrat.' },
+      { tag: 'Standard CH', title: 'Budget IT sain = 5 à 8% du CA pour 10–100 collaborateurs', meta: 'benchmark PME suisse · 2026', hook: 'Les PME bien gérées consacrent 5–8% de leur CA à l\'IT. En dessous : le risque s\'accumule silencieusement.' }
+    ],
+    staticAng: [
+      { title: 'Le lundi 8h qui change tout', hook: 'Lundi matin, 8h02. Réseau en panne. 45 collaborateurs bloqués. Qui vous rappelle en premier — vous ou votre IT ?' },
+      { title: 'Break-fix vs forfait : le vrai calcul', hook: 'Le break-fix semble moins cher. Il ne l\'est jamais. Voici les 3 raisons — avec les chiffres.' },
+      { title: '5 choses que votre prestataire ne fait probablement pas', hook: '5 choses qu\'une conciergerie IT fait — que votre prestataire actuel ne fait probablement pas.' }
+    ]
+  },
+  cloud: {
+    label: 'Cloud Computing',
+    slogan: 'Créons votre IT avec notre solution IaaS !',
+    query: 'cloud suisse PME données souveraineté nLPD hébergement 2026',
+    hashtags: '#CloudSuisse #PMERomande #nLPD #IaaS',
+    bestPost: { date: '7 mai', imp: 3, eng: '0%', label: 'Post trop abstrait — angle cloud sans ancrage terrain' },
+    staticSrc: [
+      { tag: 'Cloud Act', title: 'Données US = accessibles à la justice américaine sans préavis', meta: 'meilleurhebergement.ch · 2026', hook: 'AWS, Azure, Google US : le Cloud Act américain permet l\'accès à vos données par une autorité étrangère — sans vous prévenir.' },
+      { tag: 'nLPD', title: 'Microsoft ajuste les prix M365 E3 en Suisse dès juillet 2026', meta: 'ICTjournal · mai 2026', hook: 'Dès le 1er juillet 2026, les contrats M365 E3 augmentent en Suisse. C\'est le moment de revoir votre stratégie de licences.' },
+      { tag: 'Pratique', title: 'IaaS vs SaaS vs PaaS : ce qui compte vraiment pour une PME', meta: 'dexium.ch services · 2026', hook: 'Le vrai enjeu n\'est pas le modèle cloud choisi — c\'est de savoir où sont vos données et si vous êtes conformes nLPD.' }
+    ],
+    staticAng: [
+      { title: 'Vos données sont où, exactement ?', hook: 'Savez-vous dans quel pays physique sont hébergées vos données client, RH et contractuelles en ce moment ?' },
+      { title: 'Cloud suisse vs cloud américain', hook: 'Pour une PME romande, ce n\'est pas qu\'une question de prix. C\'est une question légale — et la réponse change en 2026.' },
+      { title: 'Les 3 erreurs de migration cloud', hook: 'La migration cloud mal cadrée crée autant de risques qu\'elle en résout. Les 3 erreurs les plus fréquentes en PME romande.' }
+    ]
+  },
+  workplace: {
+    label: 'Modern Workplace',
+    slogan: 'Rendons efficient vos postes de travail !',
+    query: 'télétravail hybride Microsoft 365 Copilot PME Suisse 2026',
+    hashtags: '#ModernWorkplace #Microsoft365 #PMESuisse #DaaS',
+    bestPost: { date: '14 avr.', imp: 14, eng: '5%', label: 'Post vidéo IT externalisé — format vidéo peu engageant' },
+    staticSrc: [
+      { tag: 'Blick · jan. 2026', title: '40% de télétravail/semaine : la norme en Suisse en 2026', meta: 'Blick / Econostrum · jan. 2026', hook: 'En Suisse, 2 jours de télétravail par semaine sont devenus la norme. L\'infrastructure IT a-t-elle vraiment suivi depuis 2020 ?' },
+      { tag: 'Stackmatix · 2026', title: '64% des licences Copilot achetées ne sont jamais utilisées', meta: 'Stackmatix / Microsoft · 2026', hook: '64% des entreprises qui ont acheté Copilot ne l\'utilisent pas. Budget dépensé, ROI inexistant.' },
+      { tag: 'ICTjournal', title: 'L\'IA progresse en Suisse sans adoption systématique — UBS', meta: 'ICTjournal / UBS · mai 2026', hook: '«Nombreuses entreprises utilisent l\'IA, mais peu le font de manière systématique.» — Alessandro Bee, UBS.' }
+    ],
+    staticAng: [
+      { title: 'DaaS : la flexibilité financière que les PME ignorent', hook: 'Device-as-a-Service : vos postes de travail en forfait mensuel prévisible, renouvellement inclus. Voici ce que ça change.' },
+      { title: 'L\'infra hybride de 2020 ne suffit plus', hook: 'Beaucoup de PME ont "activé le télétravail" en 2020. Quatre ans plus tard, l\'infrastructure n\'a pas bougé. Le risque, si.' },
+      { title: 'Copilot : comment ne pas gaspiller les licences', hook: '64% des licences Copilot ne sont jamais utilisées. Voici pourquoi — et ce que dexium fait différemment pour ses clients.' }
+    ]
+  },
+  cyber: {
+    label: 'Cyber Security',
+    slogan: 'Nous vous protégeons !',
+    query: 'cyberattaque PME Suisse OFCS vulnérabilités patch 2026',
+    hashtags: '#Cybersécurité #PMESuisse #OFCS #ManagedIT',
+    bestPost: { date: '24 mars', imp: 30, eng: '8%', label: 'Post cyber PME — meilleur taux engagement Mars' },
+    staticSrc: [
+      { tag: 'OFCS · mars 2026', title: '64 733 cyberincidents signalés en Suisse en 2025 — 1 toutes les 8,4 min', meta: 'OFCS / RTS · mars 2026', hook: 'En Suisse, une cyberattaque est signalée toutes les 8,4 minutes. 64 733 en 2025. Et elles deviennent chirurgicales, dopées à l\'IA.' },
+      { tag: 'CESIN · mai 2026', title: 'Moins de 8% des entreprises corrigent une faille critique en 24h', meta: 'I-TRACING / CESIN · mai 2026', hook: '8% seulement des organisations corrigent une faille critique en 24 heures. Les 92% restants laissent une porte ouverte.' },
+      { tag: 'Allianz CH', title: 'Erreur humaine interne = première cause de sinistre cyber en Suisse', meta: 'Allianz Suisse / DCOD · 2026', hook: 'La première cause de sinistre cyber en Suisse n\'est pas un hacker. C\'est un collaborateur qui travaille chez vous.' }
+    ],
+    staticAng: [
+      { title: 'Le chiffre que personne ne veut voir', hook: 'Moins de 8% des entreprises corrigent une faille critique en 24h. Dans votre organisation : qui s\'en occupe ?' },
+      { title: 'Ce que l\'OFCS a publié cette semaine', hook: '177 signalements de cyberattaques par jour en Suisse. C\'est le chiffre officiel OFCS 2025. Et 2026 ne s\'annonce pas plus calme.' },
+      { title: 'Clone vocal IA : la fraude qui cible les PME maintenant', hook: 'Votre comptable reçoit un appel de votre voix. Elle n\'a aucun doute. Elle vire 60 000 CHF. Clone vocal IA — ça arrive en Suisse.' }
+    ]
+  },
+  ai: {
+    label: 'Intelligence Artificielle',
+    slogan: 'Ne perdez plus de temps — travaillons sur les bonnes pratiques !',
+    query: 'intelligence artificielle PME Suisse adoption infrastructure IT 2026',
+    hashtags: '#IA #PMESuisse #CopilotM365 #TransformationDigitale',
+    bestPost: { date: '21 avr.', imp: 5, eng: '0%', label: 'Post IA trop abstrait — angle vision sans ancrage PME' },
+    staticSrc: [
+      { tag: 'UBS / ICTjournal', title: 'L\'IA progresse sans adoption systématique dans les PME suisses', meta: 'ICTjournal / UBS · mai 2026', hook: '«Nombreuses entreprises utilisent l\'IA mais peu le font de manière systématique.» Constat UBS, mai 2026.' },
+      { tag: 'Microsoft · 2026', title: 'Copilot agent mode : l\'IA change l\'infrastructure IT dès maintenant', meta: 'Microsoft Partner Center · 2026', hook: 'L\'IA agentique dans M365 modifie les besoins de connectivité, sécurité et gouvernance — que vous l\'adoptiez ou non.' },
+      { tag: 'Stackmatix', title: '12% seulement des PME < 500 emp. ont un déploiement IA actif', meta: 'Stackmatix · avril 2026', hook: '12% des PME ont un déploiement IA réellement actif. Les 88% restantes expérimentent — ou ignorent.' }
+    ],
+    staticAng: [
+      { title: 'L\'IA change votre IT — même si vous ne l\'adoptez pas', hook: 'L\'IA agentique va modifier l\'infrastructure de votre PME, que vous l\'adoptiez ou non. Ce que ça signifie concrètement.' },
+      { title: 'Ce que font les 12% qui ont vraiment adopté l\'IA', hook: '12% des PME ont un déploiement IA actif. Qu\'ont-elles fait différemment des 88% qui expérimentent encore ?' },
+      { title: 'IA : ce que vos collaborateurs font déjà sans vous le dire', hook: 'ChatGPT, Copilot, Gemini — dans la majorité des PME, les collaborateurs les utilisent sans politique ni garde-fous.' }
+    ]
+  },
+  visio: {
+    label: 'Visioconférence',
+    slogan: 'Réunissez vos équipes, où qu\'elles soient !',
+    query: 'visioconférence PME hybride Microsoft Teams Zoom Suisse 2026',
+    hashtags: '#Visioconférence #Hybride #PMESuisse #ModernWorkplace',
+    bestPost: { date: '9 avr.', imp: 11, eng: '5%', label: 'Post dialogue plan continuité — peu d\'engagement' },
+    staticSrc: [
+      { tag: 'Tendance 2026', title: 'Teams et Zoom : 2 standards, 1 seule intégration IT possible', meta: 'Microsoft / Zoom · 2026', hook: 'Votre PME utilise Teams ou Zoom ? Dans la majorité des cas, les deux. Et personne n\'a prévu l\'intégration avec l\'infrastructure.' },
+      { tag: 'Pratique', title: 'La salle de réunion hybride : 60% des PME l\'ont mal configurée', meta: 'dexium terrain · 2026', hook: 'Un écran, une webcam, un câble HDMI — ce n\'est pas une salle hybride. C\'est une salle qui frustre les participants distants.' },
+      { tag: 'ROI', title: 'DaaS + visio intégrée = poste de travail hybride complet et prévisible', meta: 'dexium.ch services', hook: 'Device-as-a-Service avec visioconférence intégrée : un collaborateur équipé partout, un coût mensuel prévisible.' }
+    ],
+    staticAng: [
+      { title: 'Le call qui coûte cher', hook: 'Votre équipe perd 12 min à chaque réunion hybride pour connecter l\'audio. Sur 10 réunions par semaine : 2 heures de productivité perdues.' },
+      { title: 'Teams vs Zoom : ce n\'est pas la bonne question', hook: 'La vraie question n\'est pas Teams ou Zoom — c\'est comment intégrer votre solution de visio à votre infrastructure existante.' },
+      { title: 'La salle de réunion de 2026', hook: 'Une salle de réunion hybride bien configurée ne dépasse pas 3 clics pour démarrer. Voici ce que ça prend — et ce que ça évite.' }
+    ]
+  },
+  ged: {
+    label: 'GED — Gestion Documentaire',
+    slogan: 'Structurez et sécurisez vos documents !',
+    query: 'GED gestion documentaire PME nLPD conformité Suisse 2026',
+    hashtags: '#GED #GestionDocumentaire #nLPD #PMESuisse',
+    bestPost: { date: '21 mai', imp: 13, eng: '5%', label: 'Post GED conformité — peu engageant, trop réglementaire' },
+    staticSrc: [
+      { tag: 'PME Web · mai 2026', title: '38% des entreprises pas encore prêtes à la facturation électronique', meta: 'PME Web · mai 2026', hook: '38% des entreprises ne sont pas encore prêtes à la facturation électronique. La transition numérique documentaire est en retard.' },
+      { tag: 'nLPD · 2026', title: 'Droit à l\'oubli + durée de conservation = obligations légales documentées', meta: 'qiminfo.ch · 2026', hook: 'Depuis la nLPD, savoir où sont vos documents, qui y a accès et combien de temps les conserver n\'est plus optionnel.' },
+      { tag: 'Terrain', title: 'PME romandes : 4 à 6 systèmes documentaires utilisés en parallèle', meta: 'observation dexium · 2026', hook: 'Email, SharePoint, Dropbox, serveur local, papier — la majorité des PME gèrent leurs docs dans 4 à 6 systèmes. Le risque est dans les angles morts.' }
+    ],
+    staticAng: [
+      { title: 'La GED n\'est plus un sujet IT', hook: 'Depuis la nLPD, la gestion documentaire engage la responsabilité personnelle du dirigeant. Ce que ça signifie pour votre PME.' },
+      { title: 'Vos documents sont dans combien d\'endroits ?', hook: 'Email, SharePoint, Dropbox, serveur, papier — votre équipe cherche en moyenne 2,5h/semaine un document. Ce que ça coûte réellement.' },
+      { title: 'Facturation électronique : êtes-vous prêts pour 2027 ?', hook: '38% des entreprises ne sont pas prêtes. La transition est inévitable — voici comment la préparer maintenant sans tout refaire.' }
+    ]
+  },
+  partner: {
+    label: 'Partenaire / Terrain',
+    slogan: 'Notre métier, c\'est votre informatique.',
+    query: 'partenariat IT PME Suisse romande témoignage managed services 2026',
+    hashtags: '#dexium #PMESuisse #ConciergerieIT #Partenaire',
+    bestPost: { date: '30 avr.', imp: 147, eng: '9%', label: 'Roomz — MEILLEUR POST : partenaire nommé + contexte concret' },
+    staticSrc: [
+      { tag: 'Signal fort', title: 'Post Roomz (30 avr.) = 147 imp., 12 réactions — record absolu dexium', meta: 'données LinkedIn dexium · avril 2026', hook: 'Le seul post qui a vraiment marché : un partenaire nommé avec un contexte concret. 147 impressions, 12 réactions, 9% d\'engagement.' },
+      { tag: 'Insight', title: 'Nommer une entreprise réelle = 5× plus d\'engagement que le générique', meta: 'analyse posts dexium · mars–mai 2026', hook: '"Un cabinet de 40 personnes à Lausanne" génère 5× plus d\'engagement que "les PME romandes en général".' },
+      { tag: 'ICTjournal', title: 'Secteur IT : +16% de fusions-acquisitions de PME suisses en 2025', meta: 'ICTjournal · fév. 2026', hook: 'Le secteur IT tire la reprise des acquisitions de PME suisses. La confiance dans les partenaires IT est un actif stratégique.' }
+    ],
+    staticAng: [
+      { title: 'Avant / Après — format le plus puissant sans client', hook: 'Ce qu\'on observe souvent : 1 responsable IT pour 80 personnes, patchs en retard. Ce que ça change avec dexium.' },
+      { title: 'Pourquoi on a choisi [outil/partenaire]', hook: 'Transparence totale sur pourquoi dexium utilise cet outil — et ce que ça change concrètement pour les PME qu\'on accompagne.' },
+      { title: 'Ce que notre partenaire SO-IT.CH apporte', hook: 'Notre réseau de partenaires nous permet de répondre à la totalité des demandes IT. Voici comment ça fonctionne pour vous.' }
+    ]
+  }
+};
+
+// ═══════════════════════════════
+// HISTORICAL DATA
+// ═══════════════════════════════
+const HISTORY = [
+  { date:'30 avr.', imp:147, eng:9, label:'Partenaire Roomz — post le plus performant', pilier:'Partenaire', format:'Infographie', tag:'best', color:'#00d4a0',
+    insight:'Nommer un vrai partenaire avec un contexte concret bat tout contenu générique. Reproduire ce format avec SO-IT.CH ou un outil certifié.' },
+  { date:'16 avr.', imp:73, eng:10, label:'Qu\'inclut vraiment un contrat Managed Services ?', pilier:'Pédagogie', format:'Infographie', tag:'good', color:'#3B8BFF',
+    insight:'Les infographies pédagogiques avec question concrète performent bien. Le taux d\'engagement 10% confirme la qualité même si la portée reste faible.' },
+  { date:'26 mars', imp:60, eng:9, label:'L\'IT interne ne suffit plus — prise de position', pilier:'Prise pos.', format:'Infographie', tag:'good', color:'#3B8BFF',
+    insight:'La prise de position directe en semaine 1 a eu la meilleure portée de mars. L\'infographie + position tranchée = combinaison à reproduire.' },
+  { date:'31 mars', imp:35, eng:40, label:'World Backup Day — sauvegardes testées ?', pilier:'Jour mondial', format:'Caroussel', tag:'ok', color:'#f59e0b',
+    insight:'40% d\'engagement = excellent taux mais 35 impressions seulement. Les jours mondiaux déclenchent de l\'engagement mais peu de portée sans pod d\'amplification.' },
+  { date:'24 mars', imp:30, eng:8, label:'3 PME sur 5 ne se sentent plus capables de faire face à une cyberattaque', pilier:'Actualité', format:'Visuel', tag:'ok', color:'#f59e0b',
+    insight:'Premier post — portée correcte pour un démarrage. Le chiffre OFCS a bien accroché. À reproduire avec sources encore plus récentes.' },
+  { date:'28 avr.', imp:9, eng:40, label:'MSP — définition précise', pilier:'Pédagogie', format:'Infographie', tag:'low', color:'#ff5c5c',
+    insight:'40% d\'engagement mais 9 impressions = post vu seulement par les abonnés existants. L\'algo n\'a pas amplifié. Manque de commentaires dans l\'heure H.' },
+  { date:'21 avr.', imp:5, eng:0, label:'L\'IA va changer votre infrastructure', pilier:'Vision', format:'Visuel', tag:'low', color:'#ff5c5c',
+    insight:'5 impressions = distribution stoppée par l\'algo. Le pilier "Vision" trop abstrait sans ancrage terrain. À reformater avec chiffre + question concrète.' },
+  { date:'22 avr.', imp:2, eng:0, label:'Journée de la Terre — Green IT', pilier:'Valeurs', format:'Vidéo', tag:'low', color:'#ff5c5c',
+    insight:'Post le moins performant. Publié un mercredi — hors créneau optimal. La vidéo sans engagement initial = mort algorithmique immédiate.' },
+];
+
+// ═══════════════════════════════
+// RENDER HISTORY
+// ═══════════════════════════════
+function renderHistory() {
+  const area = document.getElementById('histArea');
+  // Global insight
+  let html = `
+    <div class="hist-insight" style="margin-bottom:14px">
+      <div class="hi-title">Insight #1 — ce que tes données disent clairement</div>
+      <div class="hi-body">Le taux d'engagement moyen est bon (10.5%) mais la portée s'effondre depuis mi-avril : zéro commentaire sur 12 posts consécutifs. L'algo LinkedIn a stoppé la distribution. Le problème est distributional, pas éditorial. Solution : pod d'engagement + questions qui forcent des réponses.</div>
+    </div>
+    <div class="hist-insight" style="background:rgba(59,139,255,0.05);border-color:rgba(59,139,255,0.15)">
+      <div class="hi-title" style="color:var(--d-cyan)">Insight #2 — le format qui marche</div>
+      <div class="hi-body">Infographie + sujet concret + question finale = combinaison gagnante. Les vidéos et posts "vision abstraite" sous-performent systématiquement. Post Roomz (partenaire nommé) = 147 imp. vs 5 imp. pour le post IA le plus théorique.</div>
+    </div>
+    <div class="block-label" style="margin:14px 0 8px">Tous les posts · mars–mai 2026</div>
+    <div class="hist-grid">`;
+
+  HISTORY.forEach((h, i) => {
+    const tagLabel = h.tag === 'best' ? 'Meilleur' : h.tag === 'good' ? 'Bon' : h.tag === 'ok' ? 'Moyen' : 'Faible';
+    html += `<div class="hist-card ${h.tag === 'best' ? 'best' : ''}" onclick="reusePost(${i})">
+      <div class="hist-top">
+        <span class="hist-date">${h.date}</span>
+        <span class="hist-imp" style="color:${h.color}">${h.imp} imp.</span>
+      </div>
+      <div class="hist-title">${h.label}</div>
+      <div class="hist-pills">
+        <span class="hist-pill" style="background:rgba(255,255,255,0.05);color:var(--d-muted)">${h.pilier}</span>
+        <span class="hist-pill" style="background:rgba(255,255,255,0.05);color:var(--d-muted)">${h.format}</span>
+        <span class="hist-pill" style="background:${h.color}18;color:${h.color}">${tagLabel} · ${h.eng}% eng.</span>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:5px;line-height:1.45">${h.insight}</div>
+      <button class="hist-reuse">+ Réutiliser cet angle</button>
+    </div>`;
+  });
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+function reusePost(i) {
+  const h = HISTORY[i];
+  document.getElementById('hook').value = h.label;
+  document.getElementById('ccHook').textContent = h.label.length + '/120';
+  showTab('preview', document.querySelectorAll('.tab')[0]);
+}
+
+// ═══════════════════════════════
+// AI RESEARCH
+// ═══════════════════════════════
+async function doSearch() {
+  const cfg = CFG[S.service];
+  const btn = document.getElementById('btnSearch');
+  const box = document.getElementById('rboxResults');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+  box.innerHTML = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1100,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        system: `Tu es expert en veille IT pour dexium, conciergerie IT pour PME romandes suisses (Bussigny, Vaud).
+Trouve 3 sources RÉCENTES (2026 priorité) et propose 2 angles LinkedIn PERCUTANTS.
+Réponds UNIQUEMENT en JSON strict sans markdown ni backticks:
+{"sources":[{"tag":"string max 15 cars","title":"string max 80 cars","meta":"source + date max 55 cars","hook":"accroche LinkedIn max 120 cars","url":"string"}],"angles":[{"title":"string max 50 cars","hook":"accroche LinkedIn prête max 120 cars"}]}`,
+        messages: [{ role: 'user', content: `Recherche actualités récentes sur: ${cfg.query}. Focus PME Suisse romande. Chiffres concrets. Sources: OFCS, ICTjournal, RTS, DCOD, axiorix.com, bacata.net. Service dexium: ${cfg.label}.` }]
+      })
+    });
+    const data = await res.json();
+    let txt = '';
+    if (data.content) data.content.forEach(b => { if (b.type === 'text') txt += b.text; });
+    txt = txt.trim().replace(/^```json?\n?/, '').replace(/```$/, '').trim();
+    let parsed = null;
+    try { parsed = JSON.parse(txt); } catch(e) {}
+    if (parsed && parsed.sources && parsed.sources.length) {
+      S.sources = parsed.sources;
+      S.angles = parsed.angles || [];
+    } else {
+      S.sources = cfg.staticSrc.map(s => ({ ...s, url: '' }));
+      S.angles = cfg.staticAng;
+    }
+  } catch(e) {
+    S.sources = cfg.staticSrc.map(s => ({ ...s, url: '' }));
+    S.angles = cfg.staticAng;
+  }
+
+  renderResearch(box);
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="4.5" cy="4.5" r="3" stroke="white" stroke-width="1.1"/><path d="M7 7l2.5 2.5" stroke="white" stroke-width="1.1" stroke-linecap="round"/></svg> Actualiser';
+}
+
+function renderResearch(box) {
+  let html = '<div class="sec-divider"></div><div class="sec-mini">Sources fraîches</div>';
+  S.sources.forEach((s, i) => {
+    html += `<div class="src-card" id="sc${i}">
+      <span class="src-tag">${s.tag || 'Source'}</span>
+      <div class="src-title">${s.title}</div>
+      <div class="src-meta">${s.meta || ''}</div>
+      <div class="src-hook">${s.hook || ''}</div>
+      <button class="src-btn" onclick="useSrc(${i})">+ Utiliser comme accroche</button>
+    </div>`;
+  });
+  html += '<div class="sec-mini" style="margin-top:10px">Angles proposés</div>';
+  S.angles.forEach((a, i) => {
+    html += `<div class="angle-card" id="ac${i}">
+      <div class="angle-title">${a.title}</div>
+      <div class="angle-hook">"${a.hook}"</div>
+      <button class="angle-btn" onclick="useAngle(${i})">+ Utiliser</button>
+    </div>`;
+  });
+  box.innerHTML = html;
+}
+
+function useSrc(i) {
+  const s = S.sources[i];
+  document.getElementById('hook').value = s.hook || '';
+  document.getElementById('ccHook').textContent = (s.hook || '').length + '/120';
+  if (s.meta) document.getElementById('source').value = s.meta + (s.url ? ' · ' + s.url : '');
+  if (s.url) S.sourceUrl = s.url;
+  document.getElementById('sc' + i).classList.add('used');
+}
+function useAngle(i) {
+  const a = S.angles[i];
+  document.getElementById('hook').value = a.hook || '';
+  document.getElementById('ccHook').textContent = (a.hook || '').length + '/120';
+  document.getElementById('ac' + i).classList.add('used');
+}
+
+// ═══════════════════════════════
+// AI DRAFT GENERATION
+// ═══════════════════════════════
+async function doAIDraft() {
+  const cfg = CFG[S.service];
+  const hook = document.getElementById('hook').value.trim();
+  const btn = document.getElementById('btnAI');
+  const out = document.getElementById('aiDraft');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="dots"><span></span><span></span><span></span></div> Génération en cours...';
+  out.style.display = 'none';
+
+  const srcTxt = S.sources.length
+    ? S.sources.map(s => `- ${s.title} (${s.meta})`).join('\n')
+    : 'Utilise tes connaissances des PME suisses romandes.';
+
+  const histBest = HISTORY.filter(h => h.imp >= 60).map(h => `- "${h.label}" (${h.imp} imp., ${h.eng}% eng.)`).join('\n');
+
+  const prompt = `Tu es le fondateur de dexium (conciergerie IT PME romandes, Bussigny, Vaud).
+Slogan dexium : "${cfg.slogan}" — Service : ${cfg.label}
+Format demandé : ${S.format}
+Accroche choisie : ${hook || '(génère une accroche avec un chiffre réel)'}
+
+SOURCES DISPONIBLES :
+${srcTxt}
+
+POSTS QUI ONT BIEN MARCHÉ HISTORIQUEMENT :
+${histBest}
+
+RÈGLES IMPÉRATIVES :
+1. Commence directement par l'accroche (chiffre réel ou fait brutal)
+2. Corps : 3 points concrets, angle "conciergerie IT dexium" — jamais de pitch commercial
+3. Ton : direct, professionnel, humain — pas corporate, pas jargonneux
+4. Le lecteur est un dirigeant PME — pas un technicien
+5. Question finale binaire (oui/non ou chiffre) — obligatoire
+6. 3 hashtags max depuis ceux du service : ${cfg.hashtags}
+7. PAS de lien dans le post — écrire "(Source en commentaire)" si nécessaire
+8. 200–280 mots maximum
+9. NE mentionne PAS "dexium" plus d'une fois sauf si indispensable
+
+Rédige le post complet, prêt à copier-coller sur LinkedIn.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 900,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    let txt = '';
+    if (data.content) data.content.forEach(b => { if (b.type === 'text') txt += b.text; });
+    txt = txt.trim();
+    out.textContent = txt;
+    out.style.display = 'block';
+    // Auto-inject into fields
+    const lines = txt.split('\n\n');
+    if (lines.length >= 2) {
+      const firstLine = lines[0].replace(/^\*+/, '').trim();
+      if (!hook) {
+        document.getElementById('hook').value = firstLine.substring(0, 120);
+        document.getElementById('ccHook').textContent = Math.min(firstLine.length, 120) + '/120';
+      }
+      const bodyLines = lines.slice(1).filter(l => !l.trim().startsWith('#') && !l.trim().startsWith('(Source')).join('\n\n');
+      document.getElementById('body').value = bodyLines.substring(0, 1300);
+      document.getElementById('ccBody').textContent = document.getElementById('body').value.length + '/1300';
+    }
+    const tagMatch = txt.match(/((?:#[\wÀ-ÿ]+\s*){2,})/);
+    if (tagMatch) document.getElementById('hashtags').value = tagMatch[0].trim();
+    const qMatch = txt.match(/([^.!?\n]{20,}\?)(?:\s*$)/m);
+    if (qMatch) document.getElementById('question').value = qMatch[1].trim();
+    // Store first URL from sources if available
+    if (S.sources.length && S.sources[0].url) S.sourceUrl = S.sources[0].url;
+  } catch(e) {
+    out.textContent = 'Erreur de génération. Vérifie ta connexion.';
+    out.style.display = 'block';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 4H13l-3.5 2.5 1.3 4L7 9l-3.8 2.5 1.3-4L1 5h4.5L7 1z" stroke="#8b7cf8" stroke-width="1.1" stroke-linejoin="round"/></svg> Regénérer le brouillon';
+}
+
+// ═══════════════════════════════
+// PREVIEW
+// ═══════════════════════════════
+function doPreview() {
+  const hook = document.getElementById('hook').value.trim();
+  const body = document.getElementById('body').value.trim();
+  const question = document.getElementById('question').value.trim();
+  const hashtags = document.getElementById('hashtags').value.trim();
+  const source = document.getElementById('source').value.trim();
+  if (!hook && !body) { alert('Ajoute au moins une accroche ou un corps.'); return; }
+
+  let post = '';
+  if (hook) post += hook + '\n\n';
+  if (body) post += body + '\n\n';
+  if (question) post += question + '\n\n';
+  if (source) post += '(Source en commentaire)\n\n';
+  if (hashtags) post += hashtags;
+  S.postText = post.trim();
+  S.generated = true;
+
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  let bodyHtml = '';
+  if (hook) bodyHtml += `<span class="h1">${esc(hook)}</span>\n\n`;
+  if (body) bodyHtml += esc(body) + '\n\n';
+  if (question) bodyHtml += `<span class="hq">${esc(question)}</span>\n\n`;
+  if (source) bodyHtml += `<span class="hsrc">(Source en commentaire)</span>\n\n`;
+  if (hashtags) bodyHtml += `<span class="htag">${esc(hashtags)}</span>`;
+
+  const wc = S.postText.trim().split(/\s+/).filter(Boolean).length;
+  const rt = Math.ceil(wc / 200);
+
+  // Build source comment text
+  const srcField = document.getElementById('source').value.trim();
+  // Try to extract URL from source field or from S.sourceUrl
+  const urlMatch = srcField.match(/https?:\/\/[^\s]+/);
+  const sourceUrl = urlMatch ? urlMatch[0] : (S.sourceUrl || '');
+  const sourceComment = sourceUrl
+    ? `Source complète :\n${sourceUrl}`
+    : (srcField ? `Source : ${srcField}` : '');
+  S.sourceCommentText = sourceComment;
+
+  // Generate CEO repost placeholder (real generation via button)
+  const ceoPlaceholder = S.ceoText || '';
+
+  document.getElementById('previewArea').innerHTML = `
+    <div class="li-post fade">
+      <div class="li-hdr">
+        <div class="li-av">dx</div>
+        <div>
+          <div class="li-name">dexium · Page entreprise</div>
+          <div class="li-sub">Partenaire IT des PME romandes · dexium.ch · Bussigny, Vaud · maintenant</div>
+        </div>
+      </div>
+      <div class="li-body">${bodyHtml}</div>
+      <div class="li-footer">
+        <div class="li-stats">
+          <span>${wc} mots</span>
+          <span>${S.postText.length} car.</span>
+          <span>~${rt} min lecture</span>
+        </div>
+        <button class="li-copy" onclick="doCopy('main')">Copier le post</button>
+      </div>
+    </div>
+
+    <!-- SOURCE COMMENT BLOCK -->
+    <div class="publish-block fade">
+      <div class="publish-block-label" style="color:var(--d-cyan)">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M4 5.5l2.5 2.5 2.5-2.5" stroke="#3B8BFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h9" stroke="#3B8BFF" stroke-width="1.2" stroke-linecap="round"/></svg>
+        1er commentaire — lien source à poster juste après publication
+      </div>
+      <div class="publish-body" id="sourceCommentBody">${sourceComment ? esc(sourceComment) : '<span style="color:rgba(255,255,255,0.25);font-style:italic">Aucune source renseignée — ajoute l\'URL dans le champ Source à gauche.</span>'}</div>
+      <div class="publish-footer">
+        <span class="publish-hint">À coller en 1er commentaire immédiatement après avoir publié le post · jamais dans le post lui-même</span>
+        ${sourceComment ? `<button class="pub-copy-btn" id="srcCopyBtn" onclick="doCopy('source')">Copier</button>` : ''}
+      </div>
+    </div>
+
+    <!-- CEO REPOST BLOCK -->
+    <div class="ceo-block fade">
+      <div class="ceo-hdr">
+        <div class="ceo-av">CEO</div>
+        <div>
+          <div class="ceo-name">Fondateur · dexium — compte personnel</div>
+          <div class="ceo-sub">Repost pour amplifier le post de la page entreprise</div>
+        </div>
+      </div>
+      <div class="ceo-body" id="ceoBody">${ceoPlaceholder ? esc(ceoPlaceholder) : '<span style="color:rgba(255,255,255,0.25);font-style:italic">Clique sur "Générer le repost CEO" ci-dessous.</span>'}</div>
+      <div class="ceo-footer">
+        <span class="ceo-hint">Court, personnel, engageant · doit donner envie de lire le post original · 60–100 mots max</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn-gen-ceo" id="btnCEO" onclick="genCEORepost()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.2 3.3H11l-2.8 2 1.1 3.3L6 7.6l-3.3 2 1.1-3.3L1 4.3h3.8L6 1z" stroke="#8b7cf8" stroke-width="1" stroke-linejoin="round"/></svg>
+            Générer le repost CEO
+          </button>
+          ${ceoPlaceholder ? `<button class="pub-copy-btn" id="ceoCopyBtn" onclick="doCopy('ceo')">Copier</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+
+  renderScore(hook, body, question, hashtags, source);
+  showTab('score', document.querySelectorAll('.tab')[1]);
+}
+
+// ═══════════════════════════════
+// CEO REPOST GENERATION
+// ═══════════════════════════════
+async function genCEORepost() {
+  const btn = document.getElementById('btnCEO');
+  const body = document.getElementById('ceoBody');
+  if (!btn || !body) return;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+
+  const cfg = CFG[S.service];
+  const hook = document.getElementById('hook').value.trim();
+  const postBody = document.getElementById('body').value.trim();
+  const hashtags = document.getElementById('hashtags').value.trim();
+
+  const prompt = `Tu es le fondateur de dexium (conciergerie IT PME romandes, Bussigny, Vaud).
+La page entreprise dexium vient de publier ce post LinkedIn :
+
+---
+${hook}
+
+${postBody}
+---
+
+Rédige un repost court (60–90 mots MAX) que le fondateur publie sur son compte personnel pour amplifier le post de la page entreprise.
+
+RÈGLES STRICTES :
+- Ton personnel, direct, authentique — pas corporate
+- Commence par une accroche personnelle (ex: "Ce sujet me tient à cœur.", "Je partage ce post parce que...", "On en parle souvent avec nos clients.")
+- Mentionne pourquoi CE sujet est important pour les PME romandes
+- Termine par une courte question ou invitation à lire le post original
+- PAS de hashtags (le post principal en a déjà)
+- PAS de lien (LinkedIn le détecte comme post de la page automatiquement)
+- 60–90 mots MAXIMUM — court et personnel, pas un résumé du post
+
+Rédige uniquement le texte du repost, prêt à copier.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    let txt = '';
+    if (data.content) data.content.forEach(b => { if (b.type === 'text') txt += b.text; });
+    txt = txt.trim();
+    S.ceoText = txt;
+    body.textContent = txt;
+    // Add copy button if not present
+    const footer = body.nextElementSibling;
+    if (footer) {
+      const existing = footer.querySelector('#ceoCopyBtn');
+      if (!existing) {
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'pub-copy-btn';
+        copyBtn.id = 'ceoCopyBtn';
+        copyBtn.textContent = 'Copier';
+        copyBtn.onclick = () => doCopy('ceo');
+        footer.querySelector('div').appendChild(copyBtn);
+      }
+    }
+  } catch(e) {
+    body.textContent = 'Erreur de génération. Vérifie ta connexion.';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.2 3.3H11l-2.8 2 1.1 3.3L6 7.6l-3.3 2 1.1-3.3L1 4.3h3.8L6 1z" stroke="#8b7cf8" stroke-width="1" stroke-linejoin="round"/></svg> Regénérer';
+}
+
+// ═══════════════════════════════
+// SCORE
+// ═══════════════════════════════
+function renderScore(hook, body, question, hashtags, source) {
+  const wc = (hook + ' ' + body).trim().split(/\s+/).filter(Boolean).length;
+  const tags = (hashtags.match(/#\w+/g) || []).length;
+  const time = document.getElementById('pubTime').value;
+  const hasNum = /\d/.test(hook);
+  const hasLink = (hook + body).includes('http');
+
+  const crit = [
+    { lbl: 'Accroche avec chiffre ou fait brutal', ok: hook.length > 20 && (hasNum || hook.length > 65 || hook.includes('?')), fix: 'Ajoute un chiffre réel (%, CHF, nombre). "64%" bat "beaucoup" à chaque fois.' },
+    { lbl: 'Corps développé — 3 points concrets minimum', ok: body.length > 180, fix: 'Développe au moins 3 points sourcés. L\'algo valorise les posts substantiels.' },
+    { lbl: 'Question de clôture obligatoire', ok: question.length > 8, fix: 'Sans question, les gens likent sans commenter. Le commentaire déclenche la distribution.' },
+    { lbl: 'Hashtags optimisés (3–5)', ok: tags >= 3 && tags <= 5, fix: `Actuellement ${tags} hashtag${tags > 1 ? 's' : ''}. Cible : 3 à 5. Au-delà : pénalité algo.` },
+    { lbl: 'Source citée — crédibilité', ok: source.length > 4, fix: 'Citer une source OFCS, ICTjournal ou autre augmente crédibilité et partages.' },
+    { lbl: 'Heure optimale — lundi ou jeudi 7h30–8h', ok: time === '745l' || time === '745j', fix: 'Décideurs PME = LinkedIn lundi et jeudi matin avant les réunions.' },
+    { lbl: 'Pas de lien externe dans le post', ok: !hasLink, fix: 'Lien = pénalité algo car fait quitter LinkedIn. Mets-le en 1er commentaire après publication.' },
+    { lbl: 'Longueur idéale (150–300 mots)', ok: wc >= 80 && wc <= 320, fix: `${wc} mots. Zone optimale : 150–300 mots. Au-delà : "Voir plus" cache le message.` },
+  ];
+
+  const passed = crit.filter(c => c.ok).length;
+  const score = Math.round(passed / crit.length * 100);
+  const col = score >= 75 ? '#00d4a0' : score >= 50 ? '#f59e0b' : '#ff5c5c';
+  const lbl = score >= 75 ? 'Excellent' : score >= 50 ? 'À améliorer' : 'Insuffisant';
+
+  document.getElementById('scoreArea').innerHTML = `
+    <div class="score-wrap fade">
+      <div class="score-top">
+        <div>
+          <div class="score-big" style="color:${col}">${score}</div>
+          <div class="score-lbl" style="color:${col}">${lbl} · ${passed}/${crit.length} critères</div>
+        </div>
+      </div>
+      <div class="score-bar"><div class="score-fill" style="width:${score}%;background:${col}"></div></div>
+      <div class="crit">
+        ${crit.map(c => `
+          <div class="crit-row">
+            <div class="crit-dot" style="background:${c.ok ? '#00d4a0' : '#ff5c5c'}"></div>
+            <div class="crit-txt">${c.lbl}</div>
+            <span style="font-size:11px;font-weight:600;color:${c.ok ? '#00d4a0' : '#ff5c5c'}">${c.ok ? '✓' : '✗'}</span>
+          </div>
+          ${!c.ok ? `<div class="crit-fix">${c.fix}</div>` : ''}
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════
+// TIPS
+// ═══════════════════════════════
+const TIPS = [
+  { cls: 'tt-data', lbl: 'Données dexium', title: 'Le post Roomz a tout changé — reproduis ce format', body: '147 impressions, 12 réactions, 9% d\'engagement — ton meilleur résultat depuis le lancement. La recette : partenaire nommé + contexte concret + infographie. Aucun post générique n\'a approché ce résultat.', ex: 'Prochain partenaire à nommer : SO-IT.CH ou un outil certifié (Veeam, Acronis, Zoom). Même format.' },
+  { cls: 'tt-algo', lbl: 'Algorithme', title: 'Les 60 premières minutes sont décisives', body: 'LinkedIn teste chaque post sur ~50 personnes. Sans engagement dans l\'heure, la distribution s\'arrête. Depuis mi-avril : zéro commentaire sur 12 posts = spirale algorithmique négative.', ex: 'Message à envoyer avant publication : "Je publie lundi 7h45. Un commentaire dans l\'heure m\'aide beaucoup."' },
+  { cls: 'tt-algo', lbl: 'Algorithme', title: 'Répondre aux commentaires double la portée', body: 'Chaque réponse relance la distribution. Prévois 15 min à 8h15 pour répondre à tout le monde avec une question de relance — pour déclencher un 2e tour de commentaires.', ex: 'Réponse type : "Merci [prénom] — dans ton secteur c\'est pareil ?" → force un 2e commentaire et relance l\'algo.' },
+  { cls: 'tt-copy', lbl: 'Copywriting', title: 'Ne jamais commencer par "Je" ou "Nous"', body: 'L\'accroche doit être un fait, un chiffre, ou une déclaration contre-intuitive. "Je suis ravi d\'annoncer..." = ignoré immédiatement. Regarde tes posts : ceux qui commencent par un chiffre ont systématiquement plus de portée.', ex: 'Mauvais : "Nous sommes fiers de..." ✗\nBon : "64% des PME romandes n\'ont pas de plan de continuité IT." ✓' },
+  { cls: 'tt-copy', lbl: 'Copywriting', title: 'La question finale est aussi importante que l\'accroche', body: 'La question détermine si quelqu\'un commente ou scrolle. Elle doit demander une réponse courte. Tes posts avec question ont 3× plus de commentaires que ceux sans.', ex: 'Mauvais : "N\'hésitez pas à nous contacter." ✗\nBon : "Dans votre entreprise, qui gère les patchs — et sous quel délai ?" ✓' },
+  { cls: 'tt-data', lbl: 'Données dexium', title: 'Les infographies battent les vidéos et visuels statiques', body: 'Tes 5 meilleurs posts (147, 73, 60, 35, 30 imp.) sont tous des infographies. Tes pires (5, 2, 3 imp.) sont vidéo ou visuel abstrait. Le format infographie = règle, pas exception.', ex: 'Outil gratuit : Canva.com. Fond navy #0B1F3A, texte blanc, 1 chiffre central, logo dexium.ch en bas droite.' },
+  { cls: 'tt-no', lbl: 'À éviter', title: 'Jamais de lien externe dans le post', body: 'LinkedIn pénalise les posts avec liens qui font quitter la plateforme. Mets "(Source en commentaire)" dans le post — colle le vrai lien en 1er commentaire juste après publication.', ex: 'Dans le post : "(Source en commentaire)" → 1er commentaire publié aussitôt : coller le lien.' },
+  { cls: 'tt-no', lbl: 'À éviter', title: 'Plus de 5 hashtags = pénalité algo confirmée', body: 'L\'algo LinkedIn a changé en 2024. Plus de 5 hashtags pénalise la portée. 3 hashtags précis valent mieux que 8 génériques.', ex: 'Bon : #PMESuisse #ManagedIT #ConciergerieIT\nÀ éviter : #IT #cloud #tech #SMB #Suisse #MSP #startup #IA' },
+  { cls: 'tt-time', lbl: 'Timing', title: 'Lundi et jeudi 7h30–8h : les 2 seuls créneaux qui comptent', body: 'Les décideurs PME consultent LinkedIn le lundi pour démarrer la semaine et le jeudi pour anticiper le vendredi. Avant les réunions = taux d\'ouverture maximum.', ex: 'Ne publie jamais le vendredi après-midi ni le weekend. Le post Journée de la Terre (mercredi) = 2 impressions.' },
+  { cls: 'tt-algo', lbl: 'Algorithme', title: 'Commenter d\'abord augmente ta propre portée', body: 'Si tu commentes 3 posts de prospects cibles la veille de ta publication, ils sont notifiés de ton activité et plus susceptibles de commenter ton post le lendemain.', ex: 'Routine : mardi soir → commenter 3 posts CEO/DAF romands → jeudi matin → publier.' },
+  { cls: 'tt-copy', lbl: 'Copywriting', title: 'Nommer une situation concrète bat tout contenu générique', body: 'Analyse de tes posts : dès qu\'on nomme quelque chose de réel (Roomz, OFCS, un secteur précis), la portée monte. L\'abstraction tue la distribution.', ex: '"Un cabinet comptable à Lausanne de 40 personnes..." est 5× plus engageant que "les PME romandes..."' },
+  { cls: 'tt-algo', lbl: 'Algorithme', title: 'Google My Business : canal SEO local non exploité', body: 'Un post GMB/semaine (copie reformatée du post LinkedIn en 150 mots) améliore le référencement "IT PME Lausanne". Aucun concurrent local ne le fait.', ex: 'Objectif : top 3 Google pour "conciergerie IT Vaud" et "prestataire IT Bussigny".' },
+];
+
+function renderTips() {
+  document.getElementById('tipsArea').innerHTML = TIPS.map(t => `
+    <div class="tip-card">
+      <span class="tip-tag ${t.cls}">${t.lbl}</span>
+      <div class="tip-title">${t.title}</div>
+      <div class="tip-body">${t.body}</div>
+      <div class="tip-ex">${t.ex.replace(/\n/g, '<br>')}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════
+// TABS
+// ═══════════════════════════════
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('tab-' + name).classList.add('on');
+  el.classList.add('on');
+  if (name === 'history') renderHistory();
+}
+
+// ═══════════════════════════════
+// COPY
+// ═══════════════════════════════
+function doCopy(target) {
+  let text = '';
+  let btnId = '';
+  let resetLabel = '';
+  if (target === 'main' || !target) {
+    text = S.postText;
+    btnId = '.li-copy';
+    resetLabel = 'Copier le post';
+  } else if (target === 'source') {
+    text = S.sourceCommentText || '';
+    btnId = '#srcCopyBtn';
+    resetLabel = 'Copier';
+  } else if (target === 'ceo') {
+    text = S.ceoText || '';
+    btnId = '#ceoCopyBtn';
+    resetLabel = 'Copier';
+  }
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const b = document.querySelector(btnId);
+    if (!b) return;
+    const prev = b.textContent;
+    b.textContent = '✓ Copié !';
+    b.classList.add('done');
+    setTimeout(() => { b.textContent = resetLabel; b.classList.remove('done'); }, 2200);
+  });
+}
+
+// ═══════════════════════════════
+// RESET
+// ═══════════════════════════════
+function doReset() {
+  ['hook','body','question','source'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('hashtags').value = '#PMESuisse #ManagedIT #ConciergerieIT #ITRomandie';
+  document.getElementById('ccHook').textContent = '0/120';
+  document.getElementById('ccBody').textContent = '0/1300';
+  document.getElementById('aiDraft').style.display = 'none';
+  document.getElementById('rboxResults').innerHTML = '';
+  S.generated = false; S.postText = ''; S.sources = []; S.angles = []; S.sourceUrl = ''; S.ceoText = ''; S.sourceCommentText = '';
+  document.getElementById('previewArea').innerHTML = '<div class="li-empty"><svg width="44" height="44" viewBox="0 0 44 44" fill="none" style="opacity:.2;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto"><rect x="4" y="8" width="36" height="28" rx="5" stroke="white" stroke-width="1.5"/><path d="M13 18h18M13 25h12" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>Sélectionne un service, clique <strong>Rechercher</strong><br>pour les sources fraîches, puis <strong>Générer</strong>.</div>';
+  document.getElementById('scoreArea').innerHTML = '<div class="li-empty">Génère d\'abord un post pour voir le score algorithmique.</div>';
+  showTab('preview', document.querySelectorAll('.tab')[0]);
+}
+
+// INIT
+renderTips();
+</script>
+</body>
+</html>
