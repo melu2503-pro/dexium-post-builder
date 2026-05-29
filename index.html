@@ -727,21 +727,21 @@ ${srcTxt}
 Posts performants à imiter :
 ${histBest}
 
-Rédige le post LinkedIn en respectant EXACTEMENT cette structure avec une ligne vide entre chaque bloc :
+Rédige le post LinkedIn en respectant EXACTEMENT ce format. Utilise les séparateurs |||ACCROCHE|||, |||CORPS|||, |||QUESTION|||, |||HASHTAGS||| pour marquer chaque section. Ces marqueurs sont obligatoires.
 
-ACCROCHE
-Une seule ligne. Chiffre réel ou fait brutal. Ne pas commencer par Je ou Nous. Zéro tiret. Zéro markdown.
+|||ACCROCHE|||
+Une seule phrase. Chiffre réel ou fait brutal. Ne pas commencer par Je ou Nous. Zéro tiret. Zéro markdown.
 
-CORPS
-3 paragraphes séparés par une ligne vide. Angle conciergerie IT dexium. Jamais de pitch commercial. Lecteur = dirigeant PME pas technicien. Zéro tiret. Zéro liste à puces. Zéro markdown. Utiliser des pourcentages avec espace avant le signe. Phrases complètes et fluides.
+|||CORPS|||
+3 paragraphes de 2 à 3 phrases chacun. Angle conciergerie IT dexium. Jamais de pitch commercial. Lecteur = dirigeant PME. Zéro tiret. Zéro liste à puces. Zéro markdown. Phrases complètes et fluides. Chiffres avec espace avant le signe %.
 
-QUESTION
-Une seule ligne terminée par un point d\'interrogation. Réponse oui/non ou chiffre. Zéro tiret. Maximum 25 mots.
+|||QUESTION|||
+Une seule phrase terminée par un point d'interrogation. Réponse oui/non ou chiffre attendu. Maximum 25 mots. Zéro tiret.
 
-HASHTAGS
-Exactement 3 hashtags sur une seule ligne : ${cfg.hashtags}
+|||HASHTAGS|||
+Exactement ces 3 hashtags sur une seule ligne : ${cfg.hashtags}
 
-Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, zéro label de section visible, tout en français, maximum 270 mots au total.`;
+Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, les marqueurs ||| doivent apparaître tels quels, tout en français, maximum 270 mots.`;
 
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -751,47 +751,77 @@ Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, z
     const data=await res.json();
     let txt='';
     if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
-    txt=txt.trim().replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1');
+    txt=txt.trim().replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').replace(/\|\|\|[A-Z]+\|\|\|/g,'').replace(/\n{3,}/g,'\n\n').trim();
     out.textContent=txt;
     out.style.display='block';
 
-    // ── Injection dans les champs ──
-    const allLines=txt.split('\n');
-    const paraBlocks=txt.split('\n\n');
+    // ── Injection robuste avec marqueurs |||SECTION||| ──
+    const allLines = txt.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-    // 1. ACCROCHE : premier paragraphe nettoyé
-    const rawFirst=paraBlocks[0].replace(/\n/g,' ').trim();
-    if(!hook&&rawFirst.length>10){
-      document.getElementById('fHook').value=rawFirst.substring(0,120);
-      document.getElementById('ccHook').textContent=Math.min(rawFirst.length,120)+'/120';
-    }
+    // Méthode 1 : marqueurs |||SECTION|||
+    const hasMarkers = txt.includes('|||ACCROCHE|||') || txt.includes('|||CORPS|||');
+    if (hasMarkers) {
+      const getSection = (marker, nextMarker) => {
+        const start = txt.indexOf('|||' + marker + '|||');
+        if (start === -1) return '';
+        const contentStart = start + ('|||' + marker + '|||').length;
+        const end = nextMarker ? txt.indexOf('|||' + nextMarker + '|||') : txt.length;
+        return (end === -1 ? txt.slice(contentStart) : txt.slice(contentStart, end)).trim();
+      };
+      const acc = getSection('ACCROCHE', 'CORPS');
+      const corps = getSection('CORPS', 'QUESTION');
+      const quest = getSection('QUESTION', 'HASHTAGS');
+      const tags = getSection('HASHTAGS', null);
 
-    // 2. QUESTION : dernière ligne terminée par ? d'au moins 15 caractères
-    let detectedQ='';
-    for(let i=allLines.length-1;i>=0;i--){
-      const l=allLines[i].trim();
-      if(l.endsWith('?')&&l.length>=15&&!l.startsWith('#')){detectedQ=l;break;}
-    }
-    if(detectedQ) document.getElementById('fQuestion').value=detectedQ;
+      if (!hook && acc) {
+        document.getElementById('fHook').value = acc.substring(0, 120);
+        document.getElementById('ccHook').textContent = Math.min(acc.length, 120) + '/120';
+      }
+      if (corps) {
+        document.getElementById('fBody').value = corps.substring(0, 1300);
+        document.getElementById('ccBody').textContent = corps.substring(0, 1300).length + '/1300';
+      }
+      if (quest) document.getElementById('fQuestion').value = quest.replace(/\n/g, ' ').trim();
+      if (tags) document.getElementById('fHashtags').value = tags.trim().split('\n')[0].trim();
 
-    // 3. HASHTAGS
-    const tagMatch=txt.match(/((?:#[\wÀ-ÿ]+[ \t]*){2,})/);
-    if(tagMatch) document.getElementById('fHashtags').value=tagMatch[0].trim();
+    } else {
+      // Méthode 2 (fallback) : détection par contenu ligne par ligne
 
-    // 4. CORPS : tout entre le 1er paragraphe et la question/hashtags
-    const hashRe=/^(?:#[\wÀ-ÿ]+[ \t]*){2,}$/;
-    const bodyBlocks=paraBlocks.slice(1).filter(block=>{
-      const b=block.trim();
-      if(!b)return false;
-      if(b.startsWith('(Source'))return false;
-      if(hashRe.test(b))return false;
-      if(b===detectedQ)return false;
-      return true;
-    });
-    const bodyText=bodyBlocks.join('\n\n').trim();
-    if(bodyText.length>20){
-      document.getElementById('fBody').value=bodyText.substring(0,1300);
-      document.getElementById('ccBody').textContent=document.getElementById('fBody').value.length+'/1300';
+      // QUESTION : dernière ligne finissant par ? d'au moins 15 chars
+      let detectedQ = '';
+      for (let i = allLines.length - 1; i >= 0; i--) {
+        const l = allLines[i];
+        if (l.endsWith('?') && l.length >= 15 && !l.startsWith('#')) { detectedQ = l; break; }
+      }
+      if (detectedQ) document.getElementById('fQuestion').value = detectedQ;
+
+      // HASHTAGS : ligne avec 2+ hashtags
+      let detectedTags = '';
+      for (let i = allLines.length - 1; i >= 0; i--) {
+        if (/^(#[\wÀ-ÿ]+\s*){2,}$/.test(allLines[i])) { detectedTags = allLines[i]; break; }
+      }
+      if (detectedTags) document.getElementById('fHashtags').value = detectedTags.trim();
+
+      // ACCROCHE : première ligne
+      const firstLine = allLines[0] || '';
+      if (!hook && firstLine.length > 10) {
+        document.getElementById('fHook').value = firstLine.substring(0, 120);
+        document.getElementById('ccHook').textContent = Math.min(firstLine.length, 120) + '/120';
+      }
+
+      // CORPS : tout sauf accroche, question, hashtags
+      const excl = new Set([firstLine, detectedQ, detectedTags]);
+      const bodyLines = allLines.filter(l => {
+        if (excl.has(l)) return false;
+        if (l.startsWith('(Source')) return false;
+        if (/^(#[\wÀ-ÿ]+\s*){2,}$/.test(l)) return false;
+        return true;
+      });
+      const bodyText = bodyLines.join('\n').trim();
+      if (bodyText.length > 20) {
+        document.getElementById('fBody').value = bodyText.substring(0, 1300);
+        document.getElementById('ccBody').textContent = bodyText.substring(0, 1300).length + '/1300';
+      }
     }
 
     // 5. SOURCE URL
