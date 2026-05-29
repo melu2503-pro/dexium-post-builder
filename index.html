@@ -751,7 +751,9 @@ Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, l
     const data=await res.json();
     let txt='';
     if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
-    txt=txt.trim().replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').replace(/\|\|\|[A-Z]+\|\|\|/g,'').replace(/\n{3,}/g,'\n\n').trim();
+    txt=txt.trim().replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1');
+    const rawTxt=txt;
+    txt=txt.replace(/\|\|\|[A-Z]+\|\|\|/g,'').replace(/\n{3,}/g,'\n\n').trim();
     out.textContent=txt;
     out.style.display='block';
 
@@ -759,14 +761,14 @@ Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, l
     const allLines = txt.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
     // Méthode 1 : marqueurs |||SECTION|||
-    const hasMarkers = txt.includes('|||ACCROCHE|||') || txt.includes('|||CORPS|||');
+    const hasMarkers = rawTxt.includes('|||ACCROCHE|||') || rawTxt.includes('|||CORPS|||');
     if (hasMarkers) {
       const getSection = (marker, nextMarker) => {
-        const start = txt.indexOf('|||' + marker + '|||');
+        const start = rawTxt.indexOf('|||' + marker + '|||');
         if (start === -1) return '';
         const contentStart = start + ('|||' + marker + '|||').length;
-        const end = nextMarker ? txt.indexOf('|||' + nextMarker + '|||') : txt.length;
-        return (end === -1 ? txt.slice(contentStart) : txt.slice(contentStart, end)).trim();
+        const end = nextMarker ? rawTxt.indexOf('|||' + nextMarker + '|||') : rawTxt.length;
+        return (end === -1 ? rawTxt.slice(contentStart) : rawTxt.slice(contentStart, end)).trim();
       };
       const acc = getSection('ACCROCHE', 'CORPS');
       const corps = getSection('CORPS', 'QUESTION');
