@@ -1,700 +1,1398 @@
 <!DOCTYPE html>
+
 <html lang="fr">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>dexium · Post Builder</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
 <style>
+
 :root{
+
   --navy:#0B1F3A;--navy2:#0f2847;--navy3:#152d50;
+
   --cyan:#3B8BFF;--cyan2:#5fa3ff;
+
   --green:#00d4a0;--green2:rgba(0,212,160,0.1);
+
   --amber:#f59e0b;--red:#ff5c5c;--purple:#8b7cf8;
+
   --muted:#7d93b0;--white:#fff;
+
   --border:rgba(255,255,255,0.08);--borderl:rgba(255,255,255,0.15);
+
 }
+
 *{box-sizing:border-box;margin:0;padding:0}
+
 html,body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);font-size:14px;line-height:1.6;height:100%}
+
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 24px;border-bottom:1px solid var(--border);background:var(--navy);position:sticky;top:0;z-index:50}
+
 .logo{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;gap:9px}
+
 .logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#1a5fb4,var(--cyan));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
 .logo-badge{background:rgba(59,139,255,0.15);border:1px solid rgba(59,139,255,0.3);color:var(--cyan);font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600}
+
 .hdr-sub{font-size:12px;color:var(--muted)}
+
 .layout{display:grid;grid-template-columns:380px 1fr 360px;height:calc(100vh - 53px)}
+
 .panel{overflow-y:auto;padding:20px 22px;border-right:1px solid var(--border)}
+
 .panel:last-child{border-right:none;background:var(--navy3)}
+
 .mid{background:var(--navy2);padding:20px 22px;overflow-y:auto}
+
 .sec{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+
 .sec::before{content:'';width:3px;height:12px;background:var(--cyan);border-radius:2px}
+
 .blk{margin-bottom:20px}
+
 .lbl{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+
 .pills{display:flex;flex-wrap:wrap;gap:6px}
+
 .pill{background:rgba(255,255,255,0.04);border:1px solid var(--borderl);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none}
+
 .pill:hover{border-color:var(--cyan);color:var(--white)}
+
 .pill.on{background:rgba(59,139,255,0.12);border-color:var(--cyan);color:var(--cyan);font-weight:600}
+
 textarea,input[type=text],select{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--borderl);border-radius:8px;padding:10px 13px;color:var(--white);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .15s;resize:none}
+
 textarea:focus,input:focus,select:focus{border-color:var(--cyan);background:rgba(59,139,255,0.06)}
+
 textarea::placeholder,input::placeholder{color:rgba(255,255,255,0.22)}
+
 select{appearance:none;cursor:pointer}
+
 select option{background:var(--navy2)}
+
 .cw{position:relative}
+
 .cc{position:absolute;bottom:9px;right:11px;font-size:11px;color:var(--muted);pointer-events:none}
+
 .cc.w{color:var(--amber)}.cc.o{color:var(--red)}
+
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
 .note{font-size:11px;color:rgba(255,255,255,0.32);background:rgba(255,255,255,0.02);border-radius:6px;padding:7px 11px;margin-top:7px;line-height:1.6}
+
 .note b{color:rgba(255,255,255,0.45)}
+
 .btn-main{width:100%;background:var(--cyan);color:#fff;border:none;border-radius:9px;padding:12px 18px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px}
+
 .btn-main:hover{background:var(--cyan2);transform:translateY(-1px)}
+
 .btn-main:disabled{background:rgba(59,139,255,0.25);cursor:not-allowed;transform:none}
+
 .btn-ghost{width:100%;background:transparent;border:1px solid var(--borderl);border-radius:8px;padding:9px;color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .15s;margin-top:8px}
+
 .btn-ghost:hover{border-color:var(--cyan);color:var(--white)}
+
 .btn-ai{width:100%;background:rgba(139,124,248,0.08);border:1px solid rgba(139,124,248,0.25);border-radius:8px;padding:10px 13px;color:var(--purple);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;display:flex;align-items:center;gap:8px}
+
 .btn-ai:hover{background:rgba(139,124,248,0.14)}
+
 .btn-ai:disabled{opacity:.4;cursor:not-allowed}
+
 .btn-refresh{background:rgba(0,212,160,0.08);border:1px solid rgba(0,212,160,0.25);border-radius:8px;padding:10px 13px;color:var(--green);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;width:100%;font-weight:600}
+
 .btn-refresh:hover{background:rgba(0,212,160,0.14)}
+
 .btn-refresh:disabled{opacity:.4;cursor:not-allowed}
+
 /* RESEARCH */
+
 .rbox{background:rgba(59,139,255,0.04);border:1px solid rgba(59,139,255,0.2);border-radius:10px;padding:13px 15px}
+
 .rbox-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+
 .rbox-ttl{font-size:12px;font-weight:600;color:var(--cyan);display:flex;align-items:center;gap:6px}
+
 .btn-srch{background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+
 .btn-srch:hover{background:var(--cyan2)}
+
 .btn-srch:disabled{background:rgba(59,139,255,0.25);cursor:not-allowed}
+
 .src-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;transition:all .15s}
+
 .src-card:hover{border-color:var(--cyan);background:rgba(59,139,255,0.05)}
+
 .src-card.used{border-color:var(--green);background:var(--green2)}
+
 .src-tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:rgba(59,139,255,0.12);color:var(--cyan);display:inline-block;margin-bottom:6px}
+
 .src-title{font-size:13px;font-weight:600;color:var(--white);line-height:1.35;margin-bottom:3px}
+
 .src-meta{font-size:11px;color:var(--muted)}
+
 .src-hook{font-size:12px;color:var(--green);margin-top:5px;font-weight:500;line-height:1.5}
+
 .src-url{font-size:10px;color:rgba(59,139,255,0.6);margin-top:4px;word-break:break-all}
+
 .src-btn{font-size:12px;color:var(--cyan);background:none;border:none;cursor:pointer;padding:0;margin-top:5px;font-family:'Inter',sans-serif;font-weight:500}
+
 .ang-card{background:rgba(139,124,248,0.05);border:1px solid rgba(139,124,248,0.2);border-radius:8px;padding:10px 12px;margin-bottom:8px;transition:all .15s}
+
 .ang-card:hover{border-color:var(--purple)}
+
 .ang-card.used{border-color:var(--green);background:var(--green2)}
+
 .ang-title{font-size:12px;font-weight:700;color:var(--white);margin-bottom:4px}
+
 .ang-hook{font-size:12px;color:rgba(255,255,255,0.45);font-style:italic;line-height:1.5}
+
 .ang-btn{font-size:12px;color:var(--purple);background:none;border:none;cursor:pointer;padding:0;margin-top:5px;font-family:'Inter',sans-serif;font-weight:500}
+
 .ai-draft-out{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.7;white-space:pre-wrap;margin-top:8px;display:none}
+
 .divd{height:1px;background:var(--border);margin:12px 0}
+
 .smini{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+
 /* TABS CENTRAL */
+
 .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;gap:2px}
+
 .tab{padding:9px 16px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;border-bottom:2px solid transparent;font-weight:500}
+
 .tab:hover{color:var(--white)}
+
 .tab.on{color:var(--cyan);border-bottom-color:var(--cyan);font-weight:600}
+
 /* LI MOCKUP */
+
 .li-post{background:var(--navy);border:1px solid var(--borderl);border-radius:12px;padding:16px 18px;margin-bottom:10px}
+
 .li-hdr{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+
 .li-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#1a5fb4,var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;flex-shrink:0}
+
 .li-name{font-size:14px;font-weight:700;color:var(--white)}
+
 .li-sub{font-size:11px;color:var(--muted);margin-top:1px}
+
 .li-body{font-size:13px;line-height:1.8;color:rgba(255,255,255,0.85);white-space:pre-wrap;word-break:break-word}
+
 .li-foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:11px;border-top:1px solid var(--border)}
+
 .li-stats{font-size:12px;color:var(--muted);display:flex;gap:14px}
+
 .copy-main{background:var(--green);color:var(--navy);border:none;border-radius:6px;padding:7px 16px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+
 .copy-main:hover{background:#00ebb1}
+
 .copy-main.done{background:var(--cyan);color:#fff}
+
 .li-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px;line-height:1.9}
+
 /* BLOCS PUBLICATION */
+
 .pub-blk{border-radius:11px;padding:14px 16px;margin-top:11px}
+
 .pub-blk.src{background:rgba(59,139,255,0.05);border:1px solid rgba(59,139,255,0.22)}
+
 .pub-blk.ceo{background:rgba(139,124,248,0.06);border:1px solid rgba(139,124,248,0.22)}
+
 .pub-lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+
 .pub-body{font-size:13px;line-height:1.75;color:rgba(255,255,255,0.85);white-space:pre-wrap;word-break:break-all;background:rgba(255,255,255,0.04);border-radius:7px;padding:11px 13px;margin-bottom:9px;min-height:44px}
+
 .pub-body.ceo-b{word-break:break-word}
+
 .pub-foot{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+
 .pub-hint{font-size:11px;color:var(--muted);line-height:1.55;max-width:230px}
+
 .btn-copy-pub{background:transparent;border:1px solid var(--borderl);border-radius:6px;padding:6px 14px;font-family:'Inter',sans-serif;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;font-weight:500}
+
 .btn-copy-pub:hover{border-color:var(--cyan);color:var(--white)}
+
 .btn-copy-pub.done{border-color:var(--green);color:var(--green)}
+
 .ceo-hdr{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+
 .ceo-av{width:36px;height:36px;border-radius:50%;background:rgba(139,124,248,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--purple);flex-shrink:0}
+
 .btn-gen{background:rgba(139,124,248,0.12);border:1px solid rgba(139,124,248,0.3);border-radius:7px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:12px;color:var(--purple);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;font-weight:600;white-space:nowrap}
+
 .btn-gen:hover{background:rgba(139,124,248,0.2)}
+
 .btn-gen:disabled{opacity:.4;cursor:not-allowed}
+
 /* SCORE */
+
 .score-big{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700}
+
 .sbar{width:100%;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-bottom:18px}
+
 .sbar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
 .crit-row{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:7px;background:rgba(255,255,255,0.03);font-size:12px;margin-bottom:5px}
+
 .crit-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
 .crit-fix{font-size:11px;color:var(--muted);padding:2px 9px 8px 27px;line-height:1.55}
+
 /* DROITE */
+
 .rtabs{display:flex;gap:2px;margin-bottom:16px;border-bottom:1px solid var(--border)}
+
 .rtab{padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-weight:500}
+
 .rtab:hover{color:var(--white)}
+
 .rtab.on{color:var(--cyan);border-bottom-color:var(--cyan);font-weight:600}
+
 .hist-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+
 .hist-card:hover{border-color:var(--cyan);background:rgba(59,139,255,0.04)}
+
 .hist-card.best{border-color:rgba(0,212,160,0.35);background:rgba(0,212,160,0.04)}
+
 .hist-ins{border-radius:8px;padding:11px 13px;margin-bottom:10px}
+
 .tip-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:9px}
+
 .tip-tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:8px}
+
 .tt-a{background:rgba(59,139,255,0.12);color:var(--cyan)}
+
 .tt-c{background:rgba(0,212,160,0.1);color:var(--green)}
+
 .tt-t{background:rgba(245,158,11,0.1);color:var(--amber)}
+
 .tt-n{background:rgba(255,92,92,0.1);color:var(--red)}
+
 .tt-d{background:rgba(139,124,248,0.1);color:var(--purple)}
+
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+
 .kpi{background:rgba(255,255,255,0.04);border-radius:8px;padding:11px 13px}
+
 .kpi-l{font-size:11px;color:var(--muted);margin-bottom:3px}
+
 .kpi-n{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--white)}
+
 .kpi-t{font-size:11px;color:var(--green);margin-top:2px}
+
 .dots{display:inline-flex;gap:4px;align-items:center}
+
 .dots span{width:5px;height:5px;border-radius:50%;background:var(--cyan);animation:blink 1s infinite}
+
 .dots span:nth-child(2){animation-delay:.2s}
+
 .dots span:nth-child(3){animation-delay:.4s}
+
 @keyframes blink{0%,80%,100%{opacity:.15;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+
 .fade{animation:fup .28s ease}
+
 @keyframes fup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
 ::-webkit-scrollbar{width:3px}
+
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+
 </style>
+
 </head>
+
 <body>
+
 <header class="hdr">
+
   <div class="logo">
+
     <div class="logo-mark">dx</div>
+
     dexium
+
     <span class="logo-badge">Post Builder</span>
+
   </div>
+
   <span class="hdr-sub">Notre métier, c'est votre informatique · dexium.ch · Bussigny, Vaud</span>
+
 </header>
+
 <div class="layout">
 
+
+
 <!-- GAUCHE -->
+
 <div class="panel">
+
   <div class="sec">Construire le post</div>
+
   <div class="blk">
+
     <div class="lbl">Service dexium</div>
+
     <div class="pills" id="pgSvc">
+
       <div class="pill on" data-v="managed">Managed Services 360°</div>
+
       <div class="pill" data-v="cloud">Cloud Computing</div>
+
       <div class="pill" data-v="workplace">Modern Workplace</div>
+
       <div class="pill" data-v="cyber">Cyber Security</div>
+
       <div class="pill" data-v="ai">Intelligence Artificielle</div>
+
       <div class="pill" data-v="visio">Visioconférence</div>
+
       <div class="pill" data-v="ged">GED</div>
+
       <div class="pill" data-v="partner">Partenaire / Terrain</div>
+
     </div>
+
   </div>
+
   <div class="blk">
+
     <div class="lbl">Format</div>
+
     <div class="pills" id="pgFmt">
+
       <div class="pill on" data-v="texte">Texte long</div>
+
       <div class="pill" data-v="position">Prise de position</div>
+
       <div class="pill" data-v="question">Question ouverte</div>
+
       <div class="pill" data-v="pedago">Pédagogique</div>
+
       <div class="pill" data-v="coulisses">Dans les coulisses</div>
+
       <div class="pill" data-v="chiffre">Stat / Chiffre clé</div>
+
     </div>
+
   </div>
+
   <div class="blk">
+
     <div class="rbox">
+
       <div class="rbox-hdr">
+
         <span class="rbox-ttl">⏱ Recherche IA — sources et tendances</span>
+
         <button class="btn-srch" id="btnSearch" onclick="doSearch()">🔍 Rechercher</button>
+
       </div>
+
       <div style="font-size:12px;color:var(--muted);line-height:1.55">Actualités fraîches et chiffres réels selon le service sélectionné. Clique sur une source pour l'injecter dans l'accroche.</div>
+
       <div id="rboxResults"></div>
+
     </div>
+
   </div>
+
   <div class="blk">
+
     <button class="btn-refresh" id="btnIdees" onclick="doLeftIdees()">💡 Nouvelles idées IA — angles et accroches</button>
+
     <div id="leftIdeesOut" style="margin-top:8px"></div>
+
   </div>
+
   <div class="blk">
+
     <button class="btn-ai" id="btnAI" onclick="doAIDraft()">✦ Générer le brouillon complet avec l'IA</button>
+
     <div class="ai-draft-out fade" id="aiDraftOut"></div>
+
   </div>
+
   <div class="blk">
+
     <div class="lbl">Accroche — 1ère ligne visible</div>
+
     <div class="cw">
+
       <textarea id="fHook" rows="2" placeholder="Ex : 42 % des PME suisses ne se sentent pas prêtes à faire face à une cyberattaque." style="padding-right:52px"></textarea>
+
       <span class="cc" id="ccHook">0/120</span>
+
     </div>
+
     <div class="note"><b>Règle n°1 :</b> Chiffre réel ou déclaration brutale. Ne pas commencer par Je ou Nous. C'est la seule chose que 80 % des gens lisent avant de décider de continuer.</div>
+
   </div>
+
   <div class="blk">
+
     <div class="lbl">Corps du message</div>
+
     <div class="cw">
+
       <textarea id="fBody" rows="7" placeholder="Contexte sourcé, 3 points concrets, angle dexium conciergerie IT..."></textarea>
+
       <span class="cc" id="ccBody">0/1300</span>
+
     </div>
+
   </div>
+
   <div class="blk">
+
     <div class="lbl">Question de clôture</div>
+
     <input type="text" id="fQuestion" placeholder="Ex : Dans votre entreprise, qui s'en occupe et sous quel délai ?" />
+
     <div class="note"><b>Indispensable :</b> Une question à réponse oui/non ou avec un chiffre génère 3 fois plus de commentaires qu'une question ouverte. Toujours terminer par un point d'interrogation.</div>
+
   </div>
+
   <div class="row2" style="margin-bottom:12px">
+
     <div>
+
       <div class="lbl">Hashtags (3 à 5)</div>
+
       <input type="text" id="fHashtags" value="#PMESuisse #ManagedIT #ConciergerieIT #ITRomandie" />
+
     </div>
+
     <div>
+
       <div class="lbl">Heure de publication</div>
+
       <select id="fPubTime">
+
         <option value="745l">Lundi 7h45 ✓</option>
+
         <option value="745j">Jeudi 7h45 ✓</option>
+
         <option value="1200">Midi</option>
+
         <option value="1730">17h30</option>
+
         <option value="autre">Autre</option>
+
       </select>
+
     </div>
+
   </div>
+
   <div class="blk">
+
     <div class="lbl">URL de la source (ira en 1er commentaire)</div>
+
     <input type="text" id="fSource" placeholder="Ex : https://ofcs.admin.ch/rapport-2025" />
+
     <div class="note">Coller uniquement l'URL complète. Elle sera proposée en bloc copiable sous le post. Ne jamais mettre de lien dans le post lui-même, pénalité algorithmique garantie.</div>
+
   </div>
+
   <button class="btn-main" onclick="doPreview()">Générer l'aperçu et le score</button>
+
   <button class="btn-ghost" onclick="doReset()">Tout réinitialiser</button>
+
 </div>
+
+
 
 <!-- CENTRE -->
+
 <div class="mid">
+
   <div class="tabs">
+
     <div class="tab on" onclick="showTab('preview',this)">Aperçu LinkedIn</div>
+
     <div class="tab" onclick="showTab('score',this)">Score algorithmique</div>
+
   </div>
+
   <div id="tabPreview">
+
     <div id="previewArea">
+
       <div class="li-empty">
+
         <svg width="46" height="46" viewBox="0 0 46 46" fill="none" style="opacity:.2;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto"><rect x="4" y="8" width="38" height="30" rx="5" stroke="white" stroke-width="1.5"/><path d="M13 19h20M13 27h13" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+
         Sélectionne un service, clique <strong>Rechercher</strong> pour les sources fraîches,<br>puis <strong>Générer l'aperçu</strong>.
+
       </div>
+
     </div>
+
   </div>
+
   <div id="tabScore" style="display:none">
+
     <div id="scoreArea"><div class="li-empty">Génère d'abord un post pour voir le score algorithmique.</div></div>
+
   </div>
+
 </div>
+
+
 
 <!-- DROITE -->
+
 <div class="panel" style="border-right:none">
+
   <div class="rtabs">
+
     <div class="rtab on" onclick="showRTab('conseils',this)">Stratégie</div>
+
     <div class="rtab" onclick="showRTab('historique',this)">Historique et insights</div>
+
   </div>
+
   <div id="rtabConseils">
+
     <div class="blk">
+
       <div class="lbl" style="margin-bottom:9px">Objectifs actuels et cibles à 8 semaines</div>
+
       <div class="kpi-grid">
+
         <div class="kpi"><div class="kpi-l">Impressions par post</div><div class="kpi-n">14</div><div class="kpi-t">Objectif : 80 et plus</div></div>
+
         <div class="kpi"><div class="kpi-l">Commentaires par post</div><div class="kpi-n">0</div><div class="kpi-t">Objectif : 3 et plus</div></div>
+
         <div class="kpi"><div class="kpi-l">Messages directs par mois</div><div class="kpi-n">0</div><div class="kpi-t">Objectif : 2 et plus</div></div>
+
         <div class="kpi"><div class="kpi-l">Connexions C-level</div><div class="kpi-n">5 par sem.</div><div class="kpi-t">Objectif : 10 et plus</div></div>
+
       </div>
+
     </div>
+
     <div style="height:1px;background:var(--border);margin-bottom:14px"></div>
+
     <div class="lbl" style="margin-bottom:11px">12 règles fondées sur tes données</div>
+
     <div id="tipsArea"></div>
+
   </div>
+
   <div id="rtabHistorique" style="display:none"><div id="histArea"></div></div>
+
 </div>
+
 </div>
+
+
 
 <script>
+
 const APIKEY='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';
+
 const HDRS={'Content-Type':'application/json','x-api-key':APIKEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
+
 const S={svc:'managed',fmt:'texte',postText:'',srcComment:'',ceoText:'',sources:[],angles:[]};
 
+
+
 // ─── CONFIG PAR SERVICE avec sources actualisées juin 2026 ───
+
 const CFG={
+
   managed:{label:'Managed Services 360°',slogan:'Pérennisons votre IT ensemble !',query:'managed services PME Suisse coût panne IT infrastructure prestataire 2026',hashtags:'#PMESuisse #ManagedIT #ConciergerieIT #ITRomandie',
+
     staticSrc:[
+
       {tag:'Chiffre clé',title:'Une panne IT coûte entre 5 000 et 15 000 CHF à une PME suisse',meta:'bacata.net · mai 2026',hook:'Une heure d\'arrêt informatique coûte en moyenne 1 600 CHF à une PME de 20 collaborateurs. Une panne majeure peut dépasser 15 000 CHF.',url:'https://www.bacata.net/combien-coute-vraiment-une-heure-darret-informatique-pour-une-pme-suisse-en-2026/'},
+
       {tag:'La Mobilière 2026',title:'8 PME suisses sur 10 font appel à un prestataire IT externe',meta:'La Mobilière / bacata.net · 2026',hook:'80 % des PME suisses externalisent déjà leur informatique. La vraie différence se joue sur la qualité du contrat et la proactivité du partenaire.',url:'https://www.bacata.net/combien-coute-vraiment-une-heure-darret-informatique-pour-une-pme-suisse-en-2026/'},
+
       {tag:'Standard CH',title:'Un budget IT sain représente entre 5 et 8 % du chiffre d\'affaires',meta:'Benchmark PME suisse · 2026',hook:'Les PME bien gérées consacrent entre 5 % et 8 % de leur chiffre d\'affaires à leur informatique. En dessous de ce seuil, le risque s\'accumule en silence.',url:'https://axiorix.com/inflation-rh-et-cybersecurite/'},
+
       {tag:'AROM IT · 2026',title:'Les PME suisses subissent en moyenne 1 incident IT majeur tous les 18 mois',meta:'AROM IT / OFCS · 2026',hook:'Selon l\'OFCS, une PME suisse subit en moyenne un incident de sécurité majeur tous les 18 mois. Dans 80 % des cas, il était détectable à l\'avance.',url:'https://www.arom.ch/blog/cybersecurite-pme-suisse-erreurs-courantes'}
+
     ],
+
     staticAng:[
+
       {title:'Le lundi matin qui change tout',hook:'Lundi matin, 8h02. Le réseau est en panne. 45 collaborateurs bloqués. Qui vous rappelle en premier, vous ou votre IT ?'},
+
       {title:'Le vrai calcul entre break-fix et forfait',hook:'Le break-fix semble moins cher. Il ne l\'est jamais. Voici les 3 raisons chiffrées.'},
+
       {title:'Ce que votre prestataire IT ne fait probablement pas',hook:'5 choses qu\'une conciergerie IT fait systématiquement que votre prestataire actuel ne fait probablement pas.'},
+
       {title:'Infogérance ou conciergerie : quelle différence ?',hook:'Infogérance, Managed Services, conciergerie IT. Tout le monde utilise ces mots. Voici ce qu\'ils signifient vraiment pour une PME de 30 à 150 personnes.'}
+
     ]
+
   },
+
   cloud:{label:'Cloud Computing',slogan:'Créons votre IT avec notre solution IaaS !',query:'cloud suisse PME données souveraineté nLPD Microsoft 365 hébergement 2026',hashtags:'#CloudSuisse #PMERomande #nLPD #IaaS',
+
     staticSrc:[
+
       {tag:'Cloud Act',title:'Données hébergées aux USA accessibles à la justice américaine sans préavis',meta:'meilleurhebergement.ch · 2026',hook:'AWS, Azure ou Google US : le Cloud Act américain permet à une autorité étrangère d\'accéder à vos données sans vous en informer. Ce n\'est pas théorique.',url:'https://www.meilleurhebergement.ch/blog/hebergement-conforme-rgpd-nlpd/'},
+
       {tag:'ICTjournal · mai 2026',title:'Les tarifs Microsoft 365 augmentent en Suisse dès le 1er juillet 2026',meta:'ICTjournal · mai 2026',hook:'Les contrats Microsoft 365 E3 augmentent en Suisse dès le 1er juillet 2026. C\'est le moment de revoir votre stratégie de licences et d\'hébergement.',url:'https://infologo.ch/microsoft-office-365-offres/'},
+
       {tag:'mivelaz-consulting · 2026',title:'Microsoft 365 héberge vos données en Suisse, Google Workspace ne le garantit pas',meta:'mivelaz-consulting.ch · fév. 2026',hook:'Pour une PME romande, Microsoft 365 offre l\'hébergement des données en Suisse. Google Workspace stocke en Europe sans garantie suisse. Pour la nLPD, ce n\'est pas neutre.',url:'https://mivelaz-consulting.ch/blog/google-workspace-vs-microsoft-365-pme-suisse'},
+
       {tag:'almakom · 2026',title:'Le cloud souverain Microsoft Azure en Suisse simplifie la conformité nLPD',meta:'almakom.ch · 2026',hook:'Microsoft Azure Suisse permet d\'héberger vos données sur le territoire helvétique. Un argument fort pour les secteurs santé, finance et juridique.',url:'https://www.almakom.ch/en/post/microsoft-azure-sovereign-cloud-in-switzerland-security-compliance-and-control-of-your-data'}
+
     ],
+
     staticAng:[
+
       {title:'Vos données sont où, exactement ?',hook:'Savez-vous dans quel pays physique sont hébergées vos données client, RH et contractuelles en ce moment même ?'},
+
       {title:'Cloud suisse ou cloud américain',hook:'Pour une PME romande, ce n\'est pas qu\'une question de prix. C\'est une question légale, et la réponse change concrètement en 2026.'},
+
       {title:'3 erreurs classiques de migration cloud',hook:'La migration cloud mal préparée crée autant de risques qu\'elle en résout. Les 3 erreurs les plus fréquentes en PME romande.'},
+
       {title:'Microsoft 365 Basic, Standard ou Premium ?',hook:'Choisir le mauvais plan Microsoft 365 revient à payer pour des outils de sécurité inutilisés ou à exposer ses données sans le savoir. Voici le bon critère de décision.'}
+
     ]
+
   },
+
   workplace:{label:'Modern Workplace',slogan:'Rendons efficient vos postes de travail !',query:'télétravail hybride Microsoft 365 Copilot DaaS PME Suisse 2026',hashtags:'#ModernWorkplace #Microsoft365 #PMESuisse #DaaS',
+
     staticSrc:[
+
       {tag:'Blick · jan. 2026',title:'2 jours de télétravail par semaine : la norme en Suisse en 2026',meta:'Blick / Econostrum · jan. 2026',hook:'En Suisse, 2 jours de télétravail par semaine sont devenus la norme en 2026. L\'infrastructure IT de votre PME a-t-elle vraiment suivi depuis 2020 ?',url:'https://www.blick.ch/fr/suisse/teletravail-ces-entreprises-suisses-changent-leurs-conditions-id21568538.html'},
+
       {tag:'Stackmatix · 2026',title:'64 % des licences Copilot achetées ne sont jamais utilisées activement',meta:'Stackmatix / Microsoft · 2026',hook:'64 % des entreprises qui ont acheté des licences Copilot ne les utilisent pas activement. Budget dépensé, retour sur investissement inexistant.',url:'https://www.stackmatix.com/blog/copilot-market-adoption-trends'},
+
       {tag:'ICTjournal · mai 2026',title:'L\'IA progresse en Suisse sans adoption systématique selon UBS',meta:'ICTjournal / UBS · mai 2026',hook:'De nombreuses entreprises utilisent l\'IA, mais peu le font de manière systématique. C\'est le constat d\'Alessandro Bee, économiste UBS, en mai 2026.',url:'https://www.ictjournal.ch/etudes/2026-05-19/lia-progresse-dans-les-entreprises-suisses-mais-sans-adoption-systematique'},
+
       {tag:'mivelaz · fév. 2026',title:'M365 Business Basic à 6.20 CHF vs Premium à 22 CHF : le bon choix pour une PME',meta:'mivelaz-consulting.ch · 2026',hook:'La majorité des PME suisses choisissent leur plan Microsoft 365 sur la base d\'un tableau comparatif sans comprendre leurs besoins réels. Résultat : elles surpayent ou s\'exposent.',url:'https://mivelaz-consulting.ch/blog/microsoft-365-business-basic-standard-premium-choix-pme'}
+
     ],
+
     staticAng:[
+
       {title:'DaaS : la flexibilité financière que les PME ignorent',hook:'Device-as-a-Service : vos postes de travail en forfait mensuel prévisible, renouvellement inclus. Voici ce que ça change concrètement pour votre budget.'},
+
       {title:'L\'infrastructure hybride de 2020 ne suffit plus',hook:'Beaucoup de PME ont activé le télétravail en 2020. Quatre ans plus tard, l\'infrastructure n\'a pas bougé. Les risques, eux, ont évolué.'},
+
       {title:'Copilot : comment ne pas gaspiller les licences',hook:'64 % des licences Copilot achetées ne sont jamais utilisées. Voici pourquoi, et ce qu\'il faut faire avant d\'activer la suite.'},
+
       {title:'Microsoft 365 ne sauvegarde pas vos données automatiquement',hook:'Microsoft 365 ne sauvegarde pas vos emails ni vos fichiers par défaut. C\'est écrit dans les conditions d\'utilisation. La plupart des PME ne le savent pas.'}
+
     ]
+
   },
+
   cyber:{label:'Cyber Security',slogan:'Nous vous protégeons !',query:'cyberattaque PME Suisse OFCS cybersécurité vulnérabilités 2026',hashtags:'#Cybersécurité #PMESuisse #OFCS #ManagedIT',
+
     staticSrc:[
+
       {tag:'DCOD · mai 2026',title:'La Suisse affiche le taux de compromission d\'identité le plus élevé au monde',meta:'DCOD / OFCS · mai 2026',hook:'La Suisse affiche le taux de violation et de compromission d\'identité le plus élevé au monde en 2026. La gouvernance des accès est désormais la priorité absolue.',url:'https://dcod.ch/2026/05/24/cybersecurite-en-suisse-2026/'},
+
       {tag:'La Mobilière · 2025',title:'Seulement 42 % des PME suisses se sentent prêtes à une cyberattaque',meta:'La Mobilière / keyit.ch · jan. 2026',hook:'Seulement 42 % des PME suisses se sentent prêtes à faire face à une cyberattaque, alors que 81,6 % anticipent une hausse des attaques en 2026.',url:'https://www.keyit.ch/fr/blog/tendances-it-2026-pour-les-pme-suisses-cybersecurite-data-et-ia-vraiment-utiles'},
+
       {tag:'eskills · mai 2026',title:'60 % des cyberattaques suisses en 2024 ciblaient des entreprises de moins de 250 collaborateurs',meta:'eskills.ch · mai 2026',hook:'En 2024, plus de 60 % des cyberattaques suisses documentées visaient des entreprises de moins de 250 collaborateurs. Ce n\'est pas un accident.',url:'https://eskills.ch/blog/cybersecurite-sensibilisation-pme-suisse/'},
+
       {tag:'AROM IT · 2026',title:'Les 7 erreurs de cybersécurité présentes dans 9 PME suisses sur 10',meta:'AROM IT · 2026',hook:'Les mêmes 7 erreurs de cybersécurité reviennent dans presque toutes les PME suisses. Aucune ne nécessite 6 mois de projet pour être corrigée.',url:'https://www.arom.ch/blog/cybersecurite-pme-suisse-erreurs-courantes'}
+
     ],
+
     staticAng:[
+
       {title:'Le chiffre que personne ne veut voir',hook:'Seulement 42 % des PME suisses se sentent prêtes à faire face à une cyberattaque. Dans votre organisation, dans quelle catégorie vous situez-vous ?'},
+
       {title:'60 % des cibles ont moins de 250 collaborateurs',hook:'En 2024, 60 % des cyberattaques suisses visaient des entreprises de moins de 250 collaborateurs. Ce n\'est pas un hasard, c\'est une stratégie.'},
+
       {title:'La Suisse numéro 1 mondial pour la compromission d\'identité',hook:'La Suisse affiche le taux de compromission d\'identité le plus élevé au monde en 2026. Le premier périmètre à sécuriser n\'est pas technique, c\'est l\'accès.'},
+
       {title:'Le clone vocal IA qui cible les PME maintenant',hook:'Votre comptable reçoit un appel de votre voix. Elle n\'a aucun doute. Elle vire 60 000 CHF. Clone vocal généré par l\'IA, ça arrive en Suisse en 2026.'}
+
     ]
+
   },
+
   ai:{label:'Intelligence Artificielle',slogan:'Ne perdez plus de temps, travaillons sur les bonnes pratiques !',query:'intelligence artificielle PME Suisse adoption pratique outils 2026',hashtags:'#IA #PMESuisse #CopilotM365 #TransformationDigitale',
+
     staticSrc:[
+
       {tag:'UBS / ICTjournal',title:'L\'IA progresse en Suisse mais sans adoption systématique dans les PME',meta:'ICTjournal / UBS · mai 2026',hook:'De nombreuses entreprises utilisent l\'IA, mais peu le font de manière systématique. C\'est le constat d\'Alessandro Bee, économiste UBS, en mai 2026.',url:'https://www.ictjournal.ch/etudes/2026-05-19/lia-progresse-dans-les-entreprises-suisses-mais-sans-adoption-systematique'},
+
       {tag:'La Tech Actuelle · mai 2026',title:'La maîtrise des outils IA devient une compétence de base attendue en 2026',meta:'la-tech-actuelle.com · mai 2026',hook:'En 2026, les offres d\'emploi intègrent explicitement la maîtrise des outils IA. Ce n\'est plus un atout sur un CV, c\'est une compétence de base attendue comme Excel.',url:'https://www.la-tech-actuelle.com/intelligence-artificielle-en-entreprise-les-tendances-qui-transforment-le-travail-en-2026/'},
+
       {tag:'PG Management · avr. 2026',title:'Les PME suisses qui réussissent avec l\'IA ciblent d\'abord un irritant mesurable',meta:'pgmanagement.ch · avr. 2026',hook:'Les PME suisses qui tirent réellement parti de l\'IA ne cherchent pas la transformation globale. Elles ciblent d\'abord un irritant mesurable et un périmètre de données réaliste.',url:'https://pgmanagement.ch/guide-ia-pme-suisse.html'},
+
       {tag:'Microsoft · 2026',title:'Le mode agent Copilot modifie l\'infrastructure IT dès maintenant',meta:'Microsoft Partner Center · 2026',hook:'L\'IA agentique dans Microsoft 365 modifie les besoins de connectivité, de sécurité et de gouvernance des PME, que vous l\'adoptiez ou non.',url:'https://learn.microsoft.com/fr-fr/partner-center/announcements/2026-april'}
+
     ],
+
     staticAng:[
+
       {title:'L\'IA change votre IT même sans votre accord',hook:'L\'IA agentique va modifier l\'infrastructure de votre PME que vous l\'adoptiez ou non. Ce que ça signifie concrètement pour votre organisation dès maintenant.'},
+
       {title:'Ce que font les PME qui réussissent avec l\'IA',hook:'Les PME suisses qui tirent parti de l\'IA ne font pas une transformation globale. Elles commencent par un seul irritant mesurable. Voici la méthode.'},
+
       {title:'Vos collaborateurs utilisent déjà l\'IA sans le dire',hook:'ChatGPT, Copilot, Gemini. Dans la majorité des PME, les collaborateurs les utilisent sans politique, sans gouvernance et sans garde-fous. C\'est déjà votre réalité.'},
+
       {title:'L\'IA comme compétence de base en 2026',hook:'En 2026, ne pas savoir utiliser les outils IA dans son métier, c\'est comme ne pas savoir utiliser Excel en 2010. Le retard se paie en productivité.'}
+
     ]
+
   },
+
   visio:{label:'Visioconférence',slogan:'Réunissez vos équipes, où qu\'elles soient !',query:'visioconférence PME hybride Microsoft Teams Zoom intégration infrastructure 2026',hashtags:'#Visioconférence #Hybride #PMESuisse #ModernWorkplace',
+
     staticSrc:[
+
       {tag:'Blick · jan. 2026',title:'Le modèle hybride reste largement privilégié par les entreprises suisses en 2026',meta:'Blick / Econostrum · jan. 2026',hook:'En 2026, le modèle hybride reste la norme en Suisse. La question n\'est plus si vos équipes travaillent à distance, mais si votre infrastructure suit vraiment.',url:'https://www.blick.ch/fr/suisse/teletravail-ces-entreprises-suisses-changent-leurs-conditions-id21568538.html'},
+
       {tag:'Terrain dexium',title:'60 % des salles de réunion hybrides en PME sont mal configurées',meta:'Observation terrain dexium · 2026',hook:'Un écran, une webcam et un câble HDMI, ce n\'est pas une salle hybride. C\'est une salle qui frustre systématiquement les participants distants.',url:'https://dexium.ch'},
+
       {tag:'Microsoft 365',title:'Teams et Zoom coexistent dans la majorité des PME sans intégration IT',meta:'Microsoft / Zoom · 2026',hook:'La majorité des PME utilisent Teams et Zoom en parallèle sans intégration IT planifiée. C\'est une source de friction quotidienne et de risques de sécurité.',url:'https://dexium.ch'},
+
       {tag:'DaaS · dexium',title:'DaaS et visioconférence intégrée forment un poste de travail hybride complet',meta:'dexium.ch services · 2026',hook:'Device-as-a-Service avec visioconférence intégrée : un collaborateur équipé et opérationnel partout, pour un coût mensuel prévisible et maîtrisé.',url:'https://dexium.ch'}
+
     ],
+
     staticAng:[
+
       {title:'Le call qui coûte cher chaque semaine',hook:'Votre équipe perd en moyenne 12 minutes à chaque réunion hybride pour connecter l\'audio. Sur 10 réunions par semaine, ce sont 2 heures de productivité perdues.'},
+
       {title:'Teams ou Zoom, ce n\'est pas la bonne question',hook:'La vraie question n\'est pas Teams ou Zoom. C\'est comment intégrer votre solution de visioconférence à votre infrastructure existante sans créer de failles.'},
+
       {title:'La salle de réunion de 2026 en 3 clics',hook:'Une salle de réunion hybride bien configurée ne dépasse pas 3 clics pour démarrer. Voici ce que ça prend à mettre en place et ce que ça évite au quotidien.'},
+
       {title:'Hybride sans infrastructure : le risque caché',hook:'Activer le télétravail sans revoir l\'infrastructure IT, c\'est ouvrir des accès à distance sans contrôle. 3 points à vérifier cette semaine.'}
+
     ]
+
   },
+
   ged:{label:'GED — Gestion Documentaire',slogan:'Structurez et sécurisez vos documents !',query:'GED gestion documentaire PME facturation électronique nLPD conformité Suisse 2026',hashtags:'#GED #GestionDocumentaire #nLPD #PMESuisse',
+
     staticSrc:[
+
       {tag:'JDN · fév. 2026',title:'La facturation électronique obligatoire dès septembre 2026 : catalyseur pour la GED',meta:'journaldunet.com · fév. 2026',hook:'Le calendrier réglementaire de septembre 2026 sur la facturation électronique agit comme un déclencheur pour les projets de GED comptable en PME.',url:'https://www.journaldunet.com/cloud/1547859-tendances-2026-la-gestion-documentaire-a-l-ere-de-l-intelligence-et-de-la-conformite/'},
+
       {tag:'RH Mag · avr. 2026',title:'Le marché de la GED pèse 9,5 milliards d\'euros et croît de 6 à 8 % par an',meta:'rhmag.fr · avr. 2026',hook:'La facturation électronique devient obligatoire dès septembre 2026. Vérifiez la conformité de votre solution avant tout engagement.',url:'https://rhmag.fr/meilleur-logiciel-ged/'},
+
       {tag:'qiminfo · 2026',title:'La nLPD impose une durée de conservation et un droit à l\'oubli documentés',meta:'qiminfo.ch · 2026',hook:'Depuis la nLPD, savoir où sont vos documents, qui y a accès et combien de temps les conserver est une obligation légale, pas une bonne pratique.',url:'https://www.qiminfo.ch/conformite-nlpd/'},
+
       {tag:'Terrain dexium',title:'Les PME romandes gèrent leurs documents dans 4 à 6 systèmes en parallèle',meta:'Observation terrain dexium · 2026',hook:'Email, SharePoint, Dropbox, serveur local, papier. La majorité des PME romandes gèrent leurs documents dans 4 à 6 systèmes. Le risque est dans les angles morts.',url:'https://dexium.ch'}
+
     ],
+
     staticAng:[
+
       {title:'La GED n\'est plus un sujet informatique',hook:'Depuis la nLPD, la gestion documentaire engage la responsabilité personnelle du dirigeant. Ce que ça signifie concrètement pour votre PME en 2026.'},
+
       {title:'Facturation électronique : êtes-vous prêts pour septembre 2026 ?',hook:'La facturation électronique devient obligatoire en septembre 2026. 38 % des entreprises ne sont pas encore prêtes. Voici les 3 étapes pour ne pas être en retard.'},
+
       {title:'Vos documents sont dans combien d\'endroits ?',hook:'Email, SharePoint, Dropbox, serveur, papier. Votre équipe cherche en moyenne 2,5 heures par semaine un document. Ce que ça coûte vraiment en productivité.'},
+
       {title:'SharePoint est déjà dans M365 : votre GED est peut-être déjà payée',hook:'Si votre PME utilise Microsoft 365, SharePoint Online est inclus dans votre licence. C\'est une GED complète que 9 PME sur 10 n\'ont jamais activée.'}
+
     ]
+
   },
+
   partner:{label:'Partenaire / Terrain',slogan:'Notre métier, c\'est votre informatique.',query:'partenariat IT PME Suisse romande témoignage managed services client 2026',hashtags:'#dexium #PMESuisse #ConciergerieIT #Partenaire',
+
     staticSrc:[
+
       {tag:'Signal fort dexium',title:'Post Roomz du 30 avril : 147 impressions, 12 réactions, meilleur résultat dexium',meta:'Données LinkedIn dexium · avril 2026',hook:'Le seul post qui a vraiment marché depuis mars : un partenaire nommé avec un contexte concret. 147 impressions, 12 réactions et 9 % d\'engagement.',url:'https://dexium.ch'},
+
       {tag:'Insight dexium',title:'Nommer une entreprise réelle génère 5 fois plus d\'engagement que le contenu générique',meta:'Analyse posts dexium · mars à mai 2026',hook:'Un cabinet de 40 personnes à Lausanne génère 5 fois plus d\'engagement que les PME romandes en général. La spécificité crée de la reconnaissance.',url:'https://dexium.ch'},
+
       {tag:'ICTjournal · fév. 2026',title:'Le secteur IT tire la reprise des acquisitions de PME suisses avec une hausse de 16 %',meta:'ICTjournal · fév. 2026',hook:'Le nombre d\'acquisitions de PME suisses a progressé de 16 % en 2025, tiré par le secteur IT. La confiance dans les partenaires informatiques est un actif stratégique.',url:'https://www.ictjournal.ch/etudes/2026-02-13/le-secteur-it-tire-la-reprise-des-acquisitions-de-pme-en-suisse'},
+
       {tag:'Terrain dexium',title:'SO-IT.CH : le réseau de partenaires qui couvre la totalité des demandes IT',meta:'dexium.ch · 2026',hook:'Grâce à notre réseau de partenaires dont SO-IT.CH, dexium couvre la totalité des demandes IT de ses clients PME sans jamais les renvoyer vers un tiers inconnu.',url:'https://dexium.ch'}
+
     ],
+
     staticAng:[
+
       {title:'Avant et après : le format le plus puissant sans client nommé',hook:'Ce qu\'on observe souvent : 1 responsable IT pour 80 personnes, patchs en retard, aucun plan de continuité. Ce que ça change avec dexium en 6 mois.'},
+
       {title:'Pourquoi on a choisi ce partenaire ou cet outil',hook:'Transparence totale sur pourquoi dexium utilise cet outil et ce que ça change concrètement pour les PME qu\'on accompagne au quotidien.'},
+
       {title:'Ce que notre réseau SO-IT.CH apporte à nos clients',hook:'Notre réseau de partenaires nous permet de répondre à la totalité des demandes IT sans intermédiaire inconnu. Voici comment ça fonctionne pour vous.'},
+
       {title:'Le premier contrat : ce qu\'on fait dans les 30 premiers jours',hook:'Les 30 premiers jours avec dexium ne ressemblent pas à un audit interminable. Voici ce qu\'on fait concrètement dès la première semaine.'}
+
     ]
+
   }
+
 };
 
+
+
 const HISTORY=[
+
   {date:'30 avr.',imp:147,eng:9,label:'Partenaire Roomz : meilleur post de toute la période',pilier:'Partenaire',format:'Infographie',tag:'best',color:'#00d4a0',insight:'Nommer un vrai partenaire avec un contexte concret bat tout contenu générique. À reproduire avec SO-IT.CH ou un outil certifié comme Veeam, Acronis ou Zoom.'},
+
   {date:'16 avr.',imp:73,eng:10,label:'Qu\'inclut vraiment un contrat Managed Services ?',pilier:'Pédagogie',format:'Infographie',tag:'good',color:'#3B8BFF',insight:'Infographie pédagogique avec question concrète. 10 % d\'engagement confirme la qualité du contenu. La portée reste limitée par l\'absence de pod d\'engagement.'},
+
   {date:'26 mars',imp:60,eng:9,label:'L\'IT interne ne suffit plus, prise de position',pilier:'Prise de position',format:'Infographie',tag:'good',color:'#3B8BFF',insight:'Prise de position directe en semaine 1 : meilleure portée de mars. Infographie et position tranchée forment une combinaison à reproduire régulièrement.'},
+
   {date:'31 mars',imp:35,eng:40,label:'World Backup Day : sauvegardes testées ?',pilier:'Jour mondial',format:'Carrousel',tag:'ok',color:'#f59e0b',insight:'40 % d\'engagement excellent mais seulement 35 impressions. Les jours mondiaux génèrent de l\'engagement mais peu de portée sans amplification externe.'},
+
   {date:'24 mars',imp:30,eng:8,label:'3 PME sur 5 ne se sentent plus capables de faire face à une cyberattaque',pilier:'Actualité',format:'Visuel',tag:'ok',color:'#f59e0b',insight:'Premier post de la période. Portée correcte pour un démarrage. Le chiffre OFCS a bien accroché. À reproduire avec des sources encore plus récentes et précises.'},
+
   {date:'28 avr.',imp:9,eng:40,label:'MSP : définition précise',pilier:'Pédagogie',format:'Infographie',tag:'low',color:'#ff5c5c',insight:'40 % d\'engagement mais 9 impressions : post vu uniquement par les abonnés existants. L\'algo n\'a pas amplifié faute de commentaires dans l\'heure qui suit la publication.'},
+
   {date:'21 avr.',imp:5,eng:0,label:'L\'IA va changer votre infrastructure',pilier:'Vision',format:'Visuel',tag:'low',color:'#ff5c5c',insight:'5 impressions : distribution stoppée par l\'algo. Le pilier Vision est trop abstrait sans ancrage terrain. À reformater avec un chiffre précis et une question concrète.'},
+
   {date:'22 avr.',imp:2,eng:0,label:'Journée de la Terre, Green IT',pilier:'Valeurs',format:'Vidéo',tag:'low',color:'#ff5c5c',insight:'Post le moins performant de la période. Publié un mercredi, hors créneau optimal. La vidéo sans engagement initial entraîne une mort algorithmique quasi certaine.'},
+
 ];
+
+
 
 const TIPS=[
+
   {cls:'tt-d',lbl:'Données dexium',title:'Le post Roomz a tout changé : reproduis ce format',body:'147 impressions, 12 réactions, 9 % d\'engagement. Ton meilleur résultat depuis le lancement. La recette : partenaire nommé, contexte concret, infographie.',ex:'Prochain partenaire à nommer : SO-IT.CH ou un outil certifié comme Veeam, Acronis ou Zoom. Même format, même logique.'},
+
   {cls:'tt-a',lbl:'Algorithme',title:'Les 60 premières minutes sont décisives',body:'LinkedIn teste chaque post sur environ 50 personnes. Sans engagement dans l\'heure, la distribution s\'arrête. Depuis mi-avril : zéro commentaire sur 12 posts consécutifs.',ex:'Message à envoyer avant publication : Je publie lundi à 7h45. Un commentaire dans l\'heure m\'aide beaucoup.'},
+
   {cls:'tt-a',lbl:'Algorithme',title:'Répondre aux commentaires double la portée',body:'Chaque réponse relance la distribution. Prévois 15 minutes à 8h15 pour répondre à tout le monde avec une question de relance.',ex:'Réponse type : Merci (prénom), dans ton secteur c\'est pareil ? Cela force un second commentaire et relance l\'algo.'},
+
   {cls:'tt-c',lbl:'Copywriting',title:'Ne jamais commencer par Je ou Nous',body:'L\'accroche doit être un fait, un chiffre ou une déclaration contre-intuitive. Je suis ravi d\'annoncer est la façon la plus rapide d\'être ignoré.',ex:'À éviter : Nous sommes fiers de... À préférer : 42 % des PME suisses ne se sentent pas prêtes à faire face à une cyberattaque.'},
+
   {cls:'tt-c',lbl:'Copywriting',title:'La question finale est aussi importante que l\'accroche',body:'La question détermine si quelqu\'un commente ou continue à défiler. Elle doit appeler une réponse courte : un chiffre, un oui ou un non.',ex:'À éviter : N\'hésitez pas à nous contacter. À préférer : Dans votre entreprise, qui gère les patchs et sous quel délai ?'},
+
   {cls:'tt-d',lbl:'Données dexium',title:'Les infographies surpassent systématiquement les vidéos',body:'Tes 5 meilleurs posts (147, 73, 60, 35, 30 impressions) sont tous des infographies. Tes pires (5, 2, 3 impressions) sont en vidéo ou visuel abstrait.',ex:'Outil gratuit : Canva.com. Fond navy #0B1F3A, texte blanc, 1 chiffre central, logo dexium.ch en bas à droite.'},
+
   {cls:'tt-n',lbl:'À éviter',title:'Jamais de lien externe dans le post',body:'LinkedIn pénalise les posts avec des liens qui font quitter la plateforme. Mets Source en commentaire dans le post et colle le vrai lien en 1er commentaire juste après publication.',ex:'Dans le post : (Source en commentaire). Puis en 1er commentaire aussitôt après publication : coller l\'URL complète.'},
+
   {cls:'tt-n',lbl:'À éviter',title:'Plus de 5 hashtags entraîne une pénalité algorithmique confirmée',body:'Depuis 2024, plus de 5 hashtags pénalise activement la portée sur LinkedIn. 3 hashtags précis et thématiques valent mieux que 8 hashtags génériques.',ex:'À préférer : #PMESuisse #ManagedIT #ConciergerieIT. À éviter : #IT #cloud #tech #SMB #Suisse #MSP #startup #IA'},
+
   {cls:'tt-t',lbl:'Timing',title:'Lundi et jeudi matin : les 2 seuls créneaux qui comptent',body:'Les décideurs PME consultent LinkedIn le lundi pour démarrer la semaine et le jeudi pour anticiper le vendredi. Avant les réunions, l\'attention est maximale.',ex:'Ne jamais publier le vendredi après-midi ni le weekend. Le post Journée de la Terre publié un mercredi a obtenu 2 impressions.'},
+
   {cls:'tt-a',lbl:'Algorithme',title:'Commenter d\'abord augmente ta propre portée',body:'Commenter 3 posts de prospects cibles la veille notifie ces personnes de ton activité. Elles sont alors plus susceptibles de voir et commenter ton post le lendemain.',ex:'Routine : mardi soir, commenter 3 posts de CEO ou DAF romands. Jeudi matin, publier.'},
+
   {cls:'tt-c',lbl:'Copywriting',title:'Nommer une situation concrète bat tout contenu générique',body:'Dès qu\'on nomme quelque chose de réel : Roomz, l\'OFCS, un secteur précis, la portée monte. L\'abstraction tue systématiquement la distribution.',ex:'Un cabinet comptable à Lausanne de 40 personnes génère 5 fois plus d\'engagement que les PME romandes en général.'},
+
   {cls:'tt-a',lbl:'Algorithme',title:'Google My Business : canal SEO local non exploité',body:'Un post GMB par semaine, reformaté depuis LinkedIn en 150 mots, améliore le référencement local pour des recherches comme IT PME Lausanne.',ex:'Objectif : apparaître dans le top 3 Google pour conciergerie IT Vaud et prestataire IT Bussigny.'},
+
 ];
 
+
+
 // ─── PILL GROUPS ───
+
 function initPills(gid,key){
+
   document.getElementById(gid).querySelectorAll('.pill').forEach(p=>{
+
     p.onclick=()=>{
+
       document.getElementById(gid).querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));
+
       p.classList.add('on');S[key]=p.dataset.v;
+
       if(key==='svc'){document.getElementById('rboxResults').innerHTML='';S.sources=[];S.angles=[];}
+
     };
+
   });
+
 }
+
 initPills('pgSvc','svc');initPills('pgFmt','fmt');
 
+
+
 // ─── CHAR COUNTERS ───
+
 function setupCC(fid,cid,max){
+
   const f=document.getElementById(fid),c=document.getElementById(cid);
+
   f.oninput=()=>{const n=f.value.length;c.textContent=n+'/'+max;c.className='cc'+(n>max?' o':n>max*.85?' w':'');};
+
 }
+
 setupCC('fHook','ccHook',120);setupCC('fBody','ccBody',1300);
 
+
+
 // ─── TABS CENTRAL ───
+
 function showTab(name,el){
+
   ['tabPreview','tabScore'].forEach(id=>document.getElementById(id).style.display='none');
+
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+
   document.getElementById(name==='preview'?'tabPreview':'tabScore').style.display='block';
+
   el.classList.add('on');
+
 }
+
+
 
 // ─── TABS DROITE ───
+
 function showRTab(name,el){
+
   ['rtabConseils','rtabHistorique'].forEach(id=>document.getElementById(id).style.display='none');
+
   document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('on'));
+
   const map={conseils:'rtabConseils',historique:'rtabHistorique'};
+
   document.getElementById(map[name]).style.display='block';
+
   el.classList.add('on');
+
   if(name==='historique')renderHistory();
+
 }
+
+
 
 // ─── TIPS ───
+
 function renderTips(){
+
   document.getElementById('tipsArea').innerHTML=TIPS.map(t=>`
+
     <div class="tip-card">
+
       <span class="tip-tag ${t.cls}">${t.lbl}</span>
+
       <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px">${t.title}</div>
+
       <div style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.65">${t.body}</div>
+
       <div style="margin-top:8px;padding:7px 11px;background:rgba(255,255,255,0.03);border-left:2px solid var(--cyan);border-radius:0 6px 6px 0;font-size:11px;color:rgba(255,255,255,0.35);font-style:italic;line-height:1.55">${t.ex}</div>
+
     </div>`).join('');
+
 }
+
 renderTips();
 
+
+
 // ─── HISTORY ───
+
 function renderHistory(){
+
   const area=document.getElementById('histArea');
+
   let html=`
+
     <div class="hist-ins" style="background:rgba(0,212,160,0.06);border:1px solid rgba(0,212,160,0.18)"><div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">Insight n°1 : le problème est distributional, pas éditorial</div><div style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.6">Le taux d'engagement moyen est bon à 10,5 % mais la portée s'effondre depuis mi-avril. Zéro commentaire sur 12 posts consécutifs. L'algo a stoppé la distribution. Solution : pod d'engagement de 5 personnes et questions qui forcent des réponses.</div></div>
+
     <div class="hist-ins" style="background:rgba(59,139,255,0.05);border:1px solid rgba(59,139,255,0.18);margin-top:8px"><div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:4px">Insight n°2 : l'infographie avec partenaire nommé bat tout</div><div style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.6">Post Roomz partenaire nommé : 147 impressions. Post IA abstrait : 5 impressions. La combinaison infographie, sujet concret et question finale est la seule qui fonctionne de façon répétable.</div></div>
+
     <div style="font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 9px">Tous les posts de mars à mai 2026</div>`;
+
   HISTORY.forEach((h,i)=>{
+
     const tl=h.tag==='best'?'Meilleur':h.tag==='good'?'Bon':h.tag==='ok'?'Moyen':'Faible';
+
     html+=`<div class="hist-card ${h.tag==='best'?'best':''}" onclick="reusePost(${i})">
+
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+
         <span style="font-size:11px;color:var(--muted)">${h.date}</span>
+
         <span style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:${h.color}">${h.imp} imp.</span>
+
       </div>
+
       <div style="font-size:13px;color:rgba(255,255,255,0.78);line-height:1.45;margin-bottom:6px">${h.label}</div>
+
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
+
         <span style="font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--muted)">${h.pilier}</span>
+
         <span style="font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--muted)">${h.format}</span>
+
         <span style="font-size:10px;padding:2px 7px;border-radius:4px;background:${h.color}18;color:${h.color}">${tl} · ${h.eng} % eng.</span>
+
       </div>
+
       <div style="font-size:11px;color:rgba(255,255,255,0.32);line-height:1.5">${h.insight}</div>
+
       <button style="font-size:12px;color:var(--cyan);background:none;border:none;cursor:pointer;padding:0;margin-top:6px;font-family:'Inter',sans-serif;font-weight:500">Réutiliser cet angle</button>
+
     </div>`;
+
   });
+
   area.innerHTML=html;
+
 }
+
+
 
 function reusePost(i){
+
   const h=HISTORY[i];
+
   document.getElementById('fHook').value=h.label;
+
   document.getElementById('ccHook').textContent=h.label.length+'/120';
+
   showTab('preview',document.querySelectorAll('.tab')[0]);
+
 }
+
+
 
 // ─── NOUVELLES IDÉES (panneau gauche) ───
+
 async function doLeftIdees(){
+
   const area=document.getElementById('leftIdeesOut');
+
   const btn=document.getElementById('btnIdees');
+
   if(!area)return;
+
   if(area.dataset.loaded==='1'&&area.style.display!=='none'){
+
     area.style.display='none';
+
     btn.innerHTML='💡 Nouvelles idées IA — angles et accroches';
+
     return;
+
   }
+
   area.style.display='block';
+
   btn.disabled=true;
+
   btn.innerHTML='⏳ Recherche en cours...';
+
   area.innerHTML='';
+
   try{
+
     const res=await fetch('https://api.anthropic.com/v1/messages',{
+
       method:'POST',headers:HDRS,
+
       body:JSON.stringify({
+
         model:'claude-sonnet-4-20250514',max_tokens:1400,
+
         tools:[{type:'web_search_20250305',name:'web_search'}],
+
         system:`Tu es expert en veille IT pour dexium, conciergerie IT pour PME romandes suisses. Recherche les actualités IT les plus récentes de juin 2026 pour les PME suisses et propose 8 idées de posts LinkedIn variées couvrant cybersécurité, cloud, workplace, GED, IA, managed services. Réponds UNIQUEMENT en JSON strict sans markdown sans backticks : {"idees":[{"service":"string","angle":"string max 60 cars","accroche":"accroche LinkedIn max 120 cars sans tiret","source_titre":"string","source_url":"string https://...","pourquoi":"pourquoi ce post va performer max 80 cars"}]}`,
+
         messages:[{role:'user',content:'Recherche les actualités IT les plus fraîches de mai et juin 2026 pour les PME suisses romandes. Inclus des chiffres concrets et des sources récentes. Varie les services dexium : cybersécurité, cloud, Microsoft 365, GED, IA, managed services, infrastructure hybride.'}]
+
       })
+
     });
+
     const data=await res.json();
+
     let txt='';
+
     if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
+
     let parsed=null;
+
     const jm=txt.match(/\{[\s\S]*\}/);
+
     if(jm){try{parsed=JSON.parse(jm[0]);}catch(e){}}
+
     if(!parsed){const t2=txt.trim().replace(/^```json?\n?/,'').replace(/```$/,'').trim();try{parsed=JSON.parse(t2);}catch(e){}}
+
     if(parsed&&parsed.idees&&parsed.idees.length){
+
       renderIdees(area,parsed.idees);
+
       area.dataset.loaded='1';
+
     } else {
+
       renderIdeesFallback(area);
+
       area.dataset.loaded='0';
+
     }
+
   }catch(e){renderIdeesFallback(area);area.dataset.loaded='0';}
+
   btn.disabled=false;
+
   btn.innerHTML='💡 Nouvelles idées IA — ▲ masquer';
+
 }
+
+
 
 function renderIdees(area,idees){
+
   const svcColors={managed:'var(--cyan)',cloud:'#5fa3ff',workplace:'var(--green)',cyber:'var(--red)',ai:'var(--purple)',visio:'var(--amber)',ged:'#f59e0b',partner:'var(--green)'};
+
   let html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase">Idées fraîches · Juin 2026</div><button class="btn-srch" onclick="forceRefreshIdees()" style="font-size:11px">🔄 Actualiser</button></div>';
+
   idees.forEach((id,i)=>{
+
     const col=svcColors[id.service]||'var(--cyan)';
+
     html+='<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px">';
+
     html+='<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">';
+
     html+='<span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:'+col+'18;color:'+col+';flex-shrink:0">'+(id.service||'IT')+'</span>';
+
     html+='<span style="font-size:12px;font-weight:600;color:var(--white);line-height:1.3">'+(id.angle||'')+'</span></div>';
+
     html+='<div style="font-size:12px;color:var(--green);font-weight:500;line-height:1.5;margin-bottom:5px">"'+(id.accroche||'')+'"</div>';
+
     if(id.source_titre)html+='<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Source : '+id.source_titre+'</div>';
+
     if(id.pourquoi)html+='<div style="font-size:11px;color:rgba(255,255,255,0.32);font-style:italic;line-height:1.5;margin-bottom:6px">'+id.pourquoi+'</div>';
+
     html+='<button onclick="injecterIdee('+i+')" style="font-size:12px;color:var(--cyan);background:none;border:none;cursor:pointer;padding:0;font-family:\'Inter\',sans-serif;font-weight:500">↳ Injecter dans le formulaire</button></div>';
+
   });
+
   area.innerHTML=html;
+
   window._idees=idees;
+
 }
+
+
 
 function forceRefreshIdees(){
+
   const area=document.getElementById('leftIdeesOut');
+
   if(area){area.dataset.loaded='0';area.style.display='none';}
+
   doLeftIdees();
+
 }
+
+
 
 function injecterIdee(i){
+
   const id=window._idees&&window._idees[i];
+
   if(!id)return;
+
   // Service
+
   document.querySelectorAll('#pgSvc .pill').forEach(p=>{
+
     p.classList.toggle('on',p.dataset.v===id.service);
+
     if(p.dataset.v===id.service)S.svc=id.service;
+
   });
+
   // Accroche
+
   document.getElementById('fHook').value=id.accroche||'';
+
   document.getElementById('ccHook').textContent=(id.accroche||'').length+'/120';
+
   // Source
+
   if(id.source_url)document.getElementById('fSource').value=id.source_url;
+
   // Reset search results for new service
+
   document.getElementById('rboxResults').innerHTML='';S.sources=[];S.angles=[];
+
   // Switch to left panel view
+
   showTab('preview',document.querySelectorAll('.tab')[0]);
+
   showRTab('conseils',document.querySelectorAll('.rtab')[0]);
+
   alert('Idée injectée ! Clique sur "Rechercher" pour trouver d\'autres sources, puis "Générer le brouillon".');
+
 }
+
+
 
 // ─── RESEARCH ───
+
 async function doSearch(){
+
   const cfg=CFG[S.svc];
+
   const btn=document.getElementById('btnSearch');
+
   const box=document.getElementById('rboxResults');
+
   btn.disabled=true;
+
   btn.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+
   box.innerHTML='';
+
   try{
+
     const res=await fetch('https://api.anthropic.com/v1/messages',{
+
       method:'POST',headers:HDRS,
+
       body:JSON.stringify({
+
         model:'claude-sonnet-4-20250514',max_tokens:1300,
+
         tools:[{type:'web_search_20250305',name:'web_search'}],
+
         system:`Tu es expert en veille IT pour dexium, conciergerie IT pour PME romandes suisses (Bussigny, Vaud).
+
 Trouve 4 sources RÉCENTES (juin 2026 priorité, mai 2026 acceptable) et propose 4 angles LinkedIn variés et percutants.
+
 Réponds UNIQUEMENT en JSON strict sans markdown sans backticks :
+
 {"sources":[{"tag":"max 15 cars","title":"max 80 cars","meta":"source et date max 55 cars","hook":"accroche LinkedIn max 120 cars sans tiret sans markdown","url":"URL complète https://..."}],"angles":[{"title":"max 50 cars","hook":"accroche LinkedIn max 120 cars sans tiret sans markdown"}]}
+
 Très important : les accroches ne doivent pas contenir de tiret.`,
+
         messages:[{role:'user',content:`Recherche les actualités les plus récentes sur : ${cfg.query}. Focus PME Suisse romande. Chiffres concrets. Sources prioritaires : OFCS, ICTjournal, RTS, DCOD, keyit.ch, eskills.ch, arom.ch, mivelaz-consulting.ch, infologo.ch, bacata.net. Service dexium : ${cfg.label}.`}]
+
       })
+
     });
+
     const data=await res.json();
+
     let txt='';
+
     if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
+
     let parsed=null;
+
     const jm=txt.match(/\{[\s\S]*\}/);
+
     if(jm){try{parsed=JSON.parse(jm[0]);}catch(e){}}
+
     if(!parsed){const t2=txt.trim().replace(/^```json?\n?/,'').replace(/```$/,'').trim();try{parsed=JSON.parse(t2);}catch(e){}}
+
     if(parsed&&parsed.sources&&parsed.sources.length){S.sources=parsed.sources;S.angles=parsed.angles||[];}
+
     else{S.sources=cfg.staticSrc;S.angles=cfg.staticAng;}
+
   }catch(e){S.sources=cfg.staticSrc;S.angles=cfg.staticAng;}
+
   renderResearch(box);
+
   btn.disabled=false;
+
   btn.innerHTML='🔍 Actualiser';
+
 }
+
+
 
 function renderResearch(box){
+
   let html='<div class="divd"></div><div class="smini">Sources fraîches</div>';
+
   S.sources.forEach((s,i)=>{
+
     html+=`<div class="src-card" id="sc${i}">
+
       <span class="src-tag">${s.tag||'Source'}</span>
+
       <div class="src-title">${s.title}</div>
+
       <div class="src-meta">${s.meta||''}</div>
+
       <div class="src-hook">${s.hook||''}</div>
+
       ${s.url&&s.url.startsWith('http')?`<div class="src-url">${s.url}</div>`:''}
+
       <button class="src-btn" onclick="useSrc(${i})">Utiliser comme accroche</button>
+
     </div>`;
+
   });
+
   if(S.angles&&S.angles.length){
+
     html+='<div class="smini" style="margin-top:11px">Angles proposés</div>';
+
     S.angles.forEach((a,i)=>{
+
       html+=`<div class="ang-card" id="ac${i}">
+
         <div class="ang-title">${a.title}</div>
+
         <div class="ang-hook">"${a.hook}"</div>
+
         <button class="ang-btn" onclick="useAngle(${i})">Utiliser cet angle</button>
+
       </div>`;
+
     });
+
   }
+
   box.innerHTML=html;
+
 }
 
+
+
 function useSrc(i){
+
   const s=S.sources[i];
+
   document.getElementById('fHook').value=s.hook||'';
+
   document.getElementById('ccHook').textContent=(s.hook||'').length+'/120';
+
   const url=(s.url&&s.url.startsWith('http'))?s.url:(s.meta||'');
+
   document.getElementById('fSource').value=url;
+
   S.sourceUrl=url;
+
   const card=document.getElementById('sc'+i);
+
   if(card){card.classList.add('used');const b=card.querySelector('.src-btn');if(b)b.textContent='✓ Injecté';}
+
 }
+
 function useAngle(i){
+
   const a=S.angles[i];
+
   document.getElementById('fHook').value=a.hook||'';
+
   document.getElementById('ccHook').textContent=(a.hook||'').length+'/120';
+
   const card=document.getElementById('ac'+i);
+
   if(card){card.classList.add('used');const b=card.querySelector('.ang-btn');if(b)b.textContent='✓ Injecté';}
+
 }
+
+
 
 // ─── AI DRAFT ───
 async function doAIDraft(){
@@ -717,21 +1415,11 @@ ${srcTxt}
 Posts performants à imiter :
 ${histBest}
 
-Rédige le post LinkedIn en respectant EXACTEMENT ce format. Utilise les séparateurs |||ACCROCHE|||, |||CORPS|||, |||QUESTION|||, |||HASHTAGS||| pour marquer chaque section. Ces marqueurs sont obligatoires.
+Rédige un post LinkedIn complet pour dexium.
+Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, tout en français, maximum 270 mots.
 
-|||ACCROCHE|||
-Une seule phrase. Chiffre réel ou fait brutal. Ne pas commencer par Je ou Nous. Zéro tiret. Zéro markdown.
-
-|||CORPS|||
-3 paragraphes de 2 à 3 phrases chacun. Angle conciergerie IT dexium. Jamais de pitch commercial. Lecteur = dirigeant PME. Zéro tiret. Zéro liste à puces. Zéro markdown. Phrases complètes et fluides. Chiffres avec espace avant le signe %.
-
-|||QUESTION|||
-Une seule phrase terminée par un point d'interrogation. Réponse oui/non ou chiffre attendu. Maximum 25 mots. Zéro tiret.
-
-|||HASHTAGS|||
-Exactement ces 3 hashtags sur une seule ligne : ${cfg.hashtags}
-
-Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, les marqueurs ||| doivent apparaître tels quels, tout en français, maximum 270 mots.`;
+Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans markdown, sans backticks :
+{"accroche":"Une seule phrase. Chiffre réel ou fait brutal. Ne pas commencer par Je ou Nous. Max 120 caractères.","corps":"3 paragraphes de 2-3 phrases. Angle conciergerie IT dexium. Jamais de pitch commercial. Lecteur = dirigeant PME. Zéro tiret. Phrases fluides. Séparés par \n\n","question":"Une seule phrase terminée par ? Réponse oui/non ou chiffre attendu. Maximum 25 mots.","hashtags":"${cfg.hashtags}"}`;
 
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -741,300 +1429,498 @@ Règles absolues : zéro tiret dans tout le texte, zéro lien, zéro markdown, l
     const data=await res.json();
     let txt='';
     if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
-    txt=txt.trim().replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1');
-    const rawTxt=txt;
-    txt=txt.replace(/\|\|\|[A-Z]+\|\|\|/g,'').replace(/\n{3,}/g,'\n\n').trim();
-    out.textContent=txt;
-    out.style.display='block';
+    txt=txt.trim();
 
-    // ── Injection robuste avec marqueurs |||SECTION||| ──
-    const allLines = txt.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    // Parse JSON response
+    let parsed=null;
+    const jm=txt.match(/\{[\s\S]*\}/);
+    if(jm){try{parsed=JSON.parse(jm[0]);}catch(e){}}
+    if(!parsed){
+      // Try stripping backticks
+      const t2=txt.replace(/^```json?\n?/,'').replace(/```$/,'').trim();
+      try{parsed=JSON.parse(t2);}catch(e){}
+    }
 
-    // Méthode 1 : marqueurs |||SECTION|||
-    const hasMarkers = rawTxt.includes('|||ACCROCHE|||') || rawTxt.includes('|||CORPS|||');
-    if (hasMarkers) {
-      const getSection = (marker, nextMarker) => {
-        const start = rawTxt.indexOf('|||' + marker + '|||');
-        if (start === -1) return '';
-        const contentStart = start + ('|||' + marker + '|||').length;
-        const end = nextMarker ? rawTxt.indexOf('|||' + nextMarker + '|||') : rawTxt.length;
-        return (end === -1 ? rawTxt.slice(contentStart) : rawTxt.slice(contentStart, end)).trim();
-      };
-      const acc = getSection('ACCROCHE', 'CORPS');
-      const corps = getSection('CORPS', 'QUESTION');
-      const quest = getSection('QUESTION', 'HASHTAGS');
-      const tags = getSection('HASHTAGS', null);
+    if(parsed){
+      const acc=(parsed.accroche||'').replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').trim();
+      const corps=(parsed.corps||'').replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').trim();
+      const quest=(parsed.question||'').replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').trim();
+      const tags=(parsed.hashtags||cfg.hashtags).trim();
 
-      if (!hook && acc) {
-        document.getElementById('fHook').value = acc.substring(0, 120);
-        document.getElementById('ccHook').textContent = Math.min(acc.length, 120) + '/120';
+      // Display in grey box
+      const display=[acc,corps,quest,tags].filter(Boolean).join('\n\n');
+      out.textContent=display;
+      out.style.display='block';
+
+      // Inject fields
+      if(!hook&&acc){
+        document.getElementById('fHook').value=acc.substring(0,120);
+        document.getElementById('ccHook').textContent=Math.min(acc.length,120)+'/120';
       }
-      if (corps) {
-        document.getElementById('fBody').value = corps.substring(0, 1300);
-        document.getElementById('ccBody').textContent = corps.substring(0, 1300).length + '/1300';
+      if(corps){
+        document.getElementById('fBody').value=corps.substring(0,1300);
+        document.getElementById('ccBody').textContent=corps.substring(0,1300).length+'/1300';
       }
-      if (quest) document.getElementById('fQuestion').value = quest.replace(/\n/g, ' ').trim();
-      if (tags) document.getElementById('fHashtags').value = tags.trim().split('\n')[0].trim();
+      if(quest) document.getElementById('fQuestion').value=quest;
+      if(tags) document.getElementById('fHashtags').value=tags.split('\n')[0].trim();
 
     } else {
-      // Méthode 2 (fallback) : détection par contenu ligne par ligne
-
-      // QUESTION : dernière ligne finissant par ? d'au moins 15 chars
-      let detectedQ = '';
-      for (let i = allLines.length - 1; i >= 0; i--) {
-        const l = allLines[i];
-        if (l.endsWith('?') && l.length >= 15 && !l.startsWith('#')) { detectedQ = l; break; }
+      // Fallback: display raw and try line-based parsing
+      const clean=txt.replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').replace(/\n{3,}/g,'\n\n').trim();
+      out.textContent=clean||'Réponse reçue mais non structurée. Copiez le texte manuellement.';
+      out.style.display='block';
+      const allLines=clean.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+      // Question: last line ending with ?
+      let detectedQ='';
+      for(let i=allLines.length-1;i>=0;i--){
+        if(allLines[i].endsWith('?')&&allLines[i].length>=15){detectedQ=allLines[i];break;}
       }
-      if (detectedQ) document.getElementById('fQuestion').value = detectedQ;
-
-      // HASHTAGS : ligne avec 2+ hashtags
-      let detectedTags = '';
-      for (let i = allLines.length - 1; i >= 0; i--) {
-        if (/^(#[\wÀ-ÿ]+\s*){2,}$/.test(allLines[i])) { detectedTags = allLines[i]; break; }
+      // Hashtags
+      let detectedTags='';
+      for(let i=allLines.length-1;i>=0;i--){
+        if(/^(#[\wÀ-ÿ]+\s*){2,}$/.test(allLines[i])){detectedTags=allLines[i];break;}
       }
-      if (detectedTags) document.getElementById('fHashtags').value = detectedTags.trim();
-
-      // ACCROCHE : première ligne
-      const firstLine = allLines[0] || '';
-      if (!hook && firstLine.length > 10) {
-        document.getElementById('fHook').value = firstLine.substring(0, 120);
-        document.getElementById('ccHook').textContent = Math.min(firstLine.length, 120) + '/120';
+      if(!hook&&allLines[0]){
+        document.getElementById('fHook').value=allLines[0].substring(0,120);
+        document.getElementById('ccHook').textContent=Math.min(allLines[0].length,120)+'/120';
       }
-
-      // CORPS : tout sauf accroche, question, hashtags
-      const excl = new Set([firstLine, detectedQ, detectedTags]);
-      const bodyLines = allLines.filter(l => {
-        if (excl.has(l)) return false;
-        if (l.startsWith('(Source')) return false;
-        if (/^(#[\wÀ-ÿ]+\s*){2,}$/.test(l)) return false;
-        return true;
-      });
-      const bodyText = bodyLines.join('\n').trim();
-      if (bodyText.length > 20) {
-        document.getElementById('fBody').value = bodyText.substring(0, 1300);
-        document.getElementById('ccBody').textContent = bodyText.substring(0, 1300).length + '/1300';
+      if(detectedQ) document.getElementById('fQuestion').value=detectedQ;
+      if(detectedTags) document.getElementById('fHashtags').value=detectedTags;
+      const excl=new Set([allLines[0],detectedQ,detectedTags]);
+      const bodyLines=allLines.filter(l=>!excl.has(l)&&!l.startsWith('(Source')&&!/^(#[\wÀ-ÿ]+\s*){2,}$/.test(l));
+      const bodyText=bodyLines.join('\n').trim();
+      if(bodyText.length>20){
+        document.getElementById('fBody').value=bodyText.substring(0,1300);
+        document.getElementById('ccBody').textContent=bodyText.substring(0,1300).length+'/1300';
       }
     }
 
-    // 5. SOURCE URL
+    // Source URL
     const srcField=document.getElementById('fSource');
     if(!srcField.value&&S.sources.length){
       const firstSrc=S.sources.find(s=>s.url&&s.url.startsWith('http'));
       if(firstSrc){srcField.value=firstSrc.url;S.sourceUrl=firstSrc.url;}
     }
   }catch(e){
-    out.textContent='Erreur de génération. Vérifie ta connexion.';
+    out.textContent='Erreur de génération : '+e.message;
     out.style.display='block';
   }
   btn.disabled=false;
   btn.innerHTML='✦ Regénérer le brouillon';
 }
-
 // ─── PREVIEW ───
+
 function doPreview(){
+
   const hook=document.getElementById('fHook').value.trim();
+
   const body=document.getElementById('fBody').value.trim();
+
   const question=document.getElementById('fQuestion').value.trim();
+
   const hashtags=document.getElementById('fHashtags').value.trim();
+
   const sourceField=document.getElementById('fSource').value.trim();
+
   if(!hook&&!body){alert('Ajoute au moins une accroche ou un corps.');return;}
 
+
+
   let post='';
+
   if(hook)post+=hook+'\n\n';
+
   if(body)post+=body+'\n\n';
+
   if(question)post+=question+'\n\n';
+
   if(sourceField)post+='(Source en commentaire)\n\n';
+
   if(hashtags)post+=hashtags;
+
   S.postText=post.trim();
 
+
+
   const urlMatch=sourceField.match(/https?:\/\/[^\s]+/);
+
   const cleanUrl=urlMatch?urlMatch[0]:(S.sourceUrl||'');
+
   S.srcComment=cleanUrl?`Source complète :\n${cleanUrl}`:(sourceField?`Source : ${sourceField}`:'');
+
   S.ceoText=''; // reset on each new preview
 
+
+
   const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
   let bHtml='';
+
   if(hook)bHtml+=`<strong>${esc(hook)}</strong>\n\n`;
+
   if(body)bHtml+=esc(body)+'\n\n';
+
   if(question)bHtml+=`<em style="color:rgba(255,255,255,0.55)">${esc(question)}</em>\n\n`;
+
   if(sourceField)bHtml+=`<span style="color:var(--muted);font-size:12px">(Source en commentaire)</span>\n\n`;
+
   if(hashtags)bHtml+=`<span style="color:var(--cyan);font-size:13px">${esc(hashtags)}</span>`;
 
+
+
   const wc=S.postText.trim().split(/\s+/).filter(Boolean).length;
+
   const rt=Math.ceil(wc/200);
 
+
+
   document.getElementById('previewArea').innerHTML=`
+
     <div class="li-post fade">
+
       <div class="li-hdr">
+
         <div class="li-av">dx</div>
+
         <div>
+
           <div class="li-name">dexium · Page entreprise</div>
+
           <div class="li-sub">Partenaire IT des PME romandes · dexium.ch · Bussigny, Vaud · maintenant</div>
+
         </div>
+
       </div>
+
       <div class="li-body">${bHtml}</div>
+
       <div class="li-foot">
+
         <div class="li-stats"><span>${wc} mots</span><span>${S.postText.length} car.</span><span>~${rt} min</span></div>
+
         <button class="copy-main" id="btnCpMain" onclick="doCopy('main')">Copier le post</button>
+
       </div>
+
     </div>
+
+
 
     <!-- COMMENTAIRE SOURCE -->
+
     <div class="pub-blk src fade">
+
       <div class="pub-lbl" style="color:var(--cyan)">
+
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4.5 6.5L7 9l2.5-2.5" stroke="#3B8BFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h10" stroke="#3B8BFF" stroke-width="1.3" stroke-linecap="round"/></svg>
+
         1er commentaire · À poster immédiatement après la publication
+
       </div>
+
       <div class="pub-body" id="srcCommentBody">${S.srcComment?esc(S.srcComment):'<span style="color:rgba(255,255,255,0.25);font-style:italic">Aucune URL renseignée. Ajoute un lien dans le champ Source à gauche puis regénère.</span>'}</div>
+
       <div class="pub-foot">
+
         <span class="pub-hint">À coller en 1er commentaire immédiatement après publication. Jamais dans le post lui-même : pénalité algorithmique garantie.</span>
+
         ${S.srcComment?`<button class="btn-copy-pub" id="btnCpSrc" onclick="doCopy('src')">Copier</button>`:''}
+
       </div>
+
     </div>
 
+
+
     <!-- REPOST FONDATEUR -->
+
     <div class="pub-blk ceo fade">
+
       <div class="ceo-hdr">
+
         <div class="ceo-av">CEO</div>
+
         <div>
+
           <div class="li-name" style="font-size:13px">Fondateur dexium · Compte personnel LinkedIn</div>
+
           <div class="li-sub">Repost court pour amplifier le post de la page entreprise · Entre 60 et 90 mots</div>
+
         </div>
+
       </div>
+
       <div class="pub-body ceo-b" id="ceoBody"><span style="color:rgba(255,255,255,0.25);font-style:italic">Clique sur "Générer le repost" pour créer un texte court et personnel qui donne envie de lire le post de la page.</span></div>
+
       <div class="pub-foot">
+
         <span class="pub-hint">Ton personnel et direct · Zéro hashtag · Zéro lien · 60 à 90 mots maximum</span>
+
         <div style="display:flex;gap:7px;align-items:center;flex-shrink:0">
+
           <button class="btn-gen" id="btnGenCeo" onclick="genCEO()">✦ Générer le repost</button>
+
           <span id="ceoCopyWrap"></span>
+
         </div>
+
       </div>
+
     </div>`;
 
+
+
   renderScore(hook,body,question,hashtags,sourceField);
+
   showTab('score',document.querySelectorAll('.tab')[1]);
+
 }
 
+
+
 // ─── CEO REPOST ───
+
 async function genCEO(){
+
   const btn=document.getElementById('btnGenCeo');
+
   const bodyEl=document.getElementById('ceoBody');
+
   if(!btn||!bodyEl)return;
+
   btn.disabled=true;
+
   btn.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+
   const hook=document.getElementById('fHook').value.trim();
+
   const postBody=document.getElementById('fBody').value.trim();
+
   const cfg=CFG[S.svc];
 
+
+
   const prompt=`Tu es le fondateur de dexium (conciergerie IT PME romandes, Bussigny, Vaud).
+
 La page entreprise dexium vient de publier ce post LinkedIn :
+
+
 
 ${hook}
 
+
+
 ${postBody}
+
+
 
 Rédige un repost court que le fondateur publie sur son compte PERSONNEL LinkedIn pour amplifier ce post.
 
+
+
 Règles absolues :
+
 Ton personnel, direct, authentique. Pas corporate. Pas de titre.
+
 Commence par une phrase personnelle comme Ce sujet me tient à coeur depuis longtemps ou Je partage ce post parce que ou On voit ça régulièrement chez nos clients PME.
+
 Explique en 2 à 3 phrases pourquoi ce sujet est concret et important pour les PME romandes.
+
 Termine par une question courte ou une invitation à lire le post.
+
 Zéro hashtag.
+
 Zéro lien.
+
 Zéro tiret dans tout le texte.
+
 Tout en français.
+
 Entre 60 et 90 mots strictement. Compter les mots.
+
+
 
 Rédige uniquement le texte du repost, prêt à copier directement.`;
 
+
+
   try{
+
     const res=await fetch('https://api.anthropic.com/v1/messages',{
+
       method:'POST',headers:HDRS,
+
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:350,messages:[{role:'user',content:prompt}]})
+
     });
+
     const data=await res.json();
+
     let txt='';
+
     if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
+
     txt=txt.trim().replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1');
+
     S.ceoText=txt;
+
     bodyEl.textContent=txt;
+
     document.getElementById('ceoCopyWrap').innerHTML=`<button class="btn-copy-pub done" id="btnCpCeo" onclick="doCopy('ceo')">Copier</button>`;
+
     // Switch to preview tab to show result
+
     showTab('preview',document.querySelectorAll('.tab')[0]);
+
   }catch(e){
+
     bodyEl.textContent='Erreur de génération. Vérifie ta connexion.';
+
   }
+
   btn.disabled=false;
+
   btn.innerHTML='✦ Regénérer';
+
 }
+
+
 
 // ─── SCORE ───
+
 function renderScore(hook,body,question,hashtags,source){
+
   const wc=(hook+' '+body).trim().split(/\s+/).filter(Boolean).length;
+
   const tags=(hashtags.match(/#\w+/g)||[]).length;
+
   const time=document.getElementById('fPubTime').value;
+
   const hasNum=/\d/.test(hook);
+
   const hasLink=(hook+body).includes('http');
+
   const crit=[
+
     {lbl:'Accroche avec chiffre ou fait brutal',ok:hook.length>20&&(hasNum||hook.length>65||hook.includes('?')),fix:'Ajoute un chiffre réel avec le signe % ou en CHF. 42 % bat beaucoup à chaque fois.'},
+
     {lbl:'Corps développé avec 3 points concrets',ok:body.length>180,fix:'Développe au moins 3 points sourcés. L\'algo valorise les posts substantiels.'},
+
     {lbl:'Question de clôture obligatoire',ok:question.length>8,fix:'Sans question, les gens likent sans commenter. Le commentaire déclenche la distribution.'},
+
     {lbl:'Hashtags entre 3 et 5',ok:tags>=3&&tags<=5,fix:`Actuellement ${tags} hashtag${tags>1?'s':''}. Cible : entre 3 et 5. Au-delà : pénalité algorithmique.`},
+
     {lbl:'URL source renseignée',ok:source.length>5,fix:'Renseigne l\'URL source. Elle sera proposée en bloc copiable pour le 1er commentaire.'},
+
     {lbl:'Publication lundi ou jeudi à 7h30',ok:time==='745l'||time==='745j',fix:'Les décideurs PME sont sur LinkedIn le lundi et jeudi matin, avant les réunions.'},
+
     {lbl:'Pas de lien externe dans le post',ok:!hasLink,fix:'Un lien pénalise l\'algo car il fait quitter LinkedIn. Le mettre en 1er commentaire après publication.'},
+
     {lbl:'Longueur entre 150 et 300 mots',ok:wc>=80&&wc<=320,fix:`${wc} mots actuellement. Zone optimale : entre 150 et 300 mots.`},
+
   ];
+
   const passed=crit.filter(c=>c.ok).length;
+
   const score=Math.round(passed/crit.length*100);
+
   const col=score>=75?'#00d4a0':score>=50?'#f59e0b':'#ff5c5c';
+
   const lbl=score>=75?'Excellent':score>=50?'À améliorer':'Insuffisant';
+
   document.getElementById('scoreArea').innerHTML=`
+
     <div class="fade">
+
       <div style="display:flex;align-items:center;gap:18px;margin-bottom:10px">
+
         <div><div class="score-big" style="color:${col}">${score}</div><div style="font-size:13px;color:${col};font-weight:600">${lbl} · ${passed} sur ${crit.length} critères</div></div>
+
       </div>
+
       <div class="sbar"><div class="sbar-fill" style="width:${score}%;background:${col}"></div></div>
+
       ${crit.map(c=>`
+
         <div class="crit-row">
+
           <div class="crit-dot" style="background:${c.ok?'#00d4a0':'#ff5c5c'}"></div>
+
           <div style="flex:1;color:rgba(255,255,255,0.7);font-size:12px">${c.lbl}</div>
+
           <span style="font-size:12px;font-weight:700;color:${c.ok?'#00d4a0':'#ff5c5c'}">${c.ok?'✓':'✗'}</span>
+
         </div>
+
         ${!c.ok?`<div class="crit-fix">${c.fix}</div>`:''}`).join('')}
+
     </div>`;
+
 }
+
+
 
 // ─── COPY ───
+
 function doCopy(target){
+
   let text='',btnId='';
+
   if(target==='main'){text=S.postText;btnId='btnCpMain';}
+
   else if(target==='src'){text=S.srcComment;btnId='btnCpSrc';}
+
   else if(target==='ceo'){text=S.ceoText;btnId='btnCpCeo';}
+
   if(!text)return;
+
   navigator.clipboard.writeText(text).then(()=>{
+
     const b=document.getElementById(btnId);
+
     if(!b)return;
+
     const prev=b.textContent;
+
     b.textContent='✓ Copié !';b.classList.add('done');
+
     setTimeout(()=>{b.textContent=prev;b.classList.remove('done');},2200);
+
   });
+
 }
 
+
+
 // ─── RESET ───
+
 function doReset(){
+
   ['fHook','fBody','fQuestion','fSource'].forEach(id=>document.getElementById(id).value='');
+
   document.getElementById('fHashtags').value='#PMESuisse #ManagedIT #ConciergerieIT #ITRomandie';
+
   document.getElementById('ccHook').textContent='0/120';
+
   document.getElementById('ccBody').textContent='0/1300';
+
   document.getElementById('aiDraftOut').style.display='none';
+
   document.getElementById('rboxResults').innerHTML='';
+
   S.postText='';S.srcComment='';S.ceoText='';S.sources=[];S.angles=[];S.sourceUrl='';
+
   document.getElementById('previewArea').innerHTML='<div class="li-empty"><svg width="46" height="46" viewBox="0 0 46 46" fill="none" style="opacity:.2;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto"><rect x="4" y="8" width="38" height="30" rx="5" stroke="white" stroke-width="1.5"/><path d="M13 19h20M13 27h13" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>Sélectionne un service, clique <strong>Rechercher</strong> pour les sources fraîches,<br>puis <strong>Générer l\'aperçu</strong>.</div>';
+
   document.getElementById('scoreArea').innerHTML='<div class="li-empty">Génère d\'abord un post pour voir le score algorithmique.</div>';
+
   showTab('preview',document.querySelectorAll('.tab')[0]);
+
 }
+
 </script>
+
 </body>
+
 </html>
+
