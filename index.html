@@ -325,16 +325,12 @@ select option{background:var(--navy2)}
   </div>
 
   <div style="display:flex;align-items:center;gap:8px">
-    <span id="keyOk" style="display:none;font-size:12px;color:#00d4a0">✓ Clé API active</span>
-    <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600">⚠ Clé API manquante</span>
-    <input type="password" id="apiKeyInput" placeholder="Colle ta clé sk-ant-api03-..." autocomplete="off"
-      style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:5px 10px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;width:220px;outline:none"
-      oninput="saveApiKey(this.value)" onchange="saveApiKey(this.value)"
-      onpaste="setTimeout(function(){saveApiKey(document.getElementById('apiKeyInput').value);},100)"
-      onkeydown="if(event.key==='Enter')saveApiKey(this.value)" />
-    <button onclick="saveApiKey(document.getElementById('apiKeyInput').value)" title="Enregistrer la clé" style="background:#00d4a0;border:none;border-radius:6px;padding:5px 12px;color:#0B1F3A;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px">✓</button>
+    <span id="keyOk" style="display:none;font-size:12px;color:#00d4a0">&#10003; Clé API active</span>
+    <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600">&#9888; Clé API manquante</span>
+    <input type="password" id="apiKeyInput" placeholder="Colle ta clé sk-ant-api03-..." autocomplete="off" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:5px 10px;color:#fff;font-family:Inter,sans-serif;font-size:12px;width:220px;outline:none" />
+    <button id="btnSaveKey" style="background:#00d4a0;border:none;border-radius:6px;padding:5px 12px;color:#0B1F3A;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px">&#10003; OK</button>
   </div>
-</header>
+</header>
 
 <div class="layout">
 
@@ -901,25 +897,40 @@ const TIPS=[
 
 // ─── API KEY MANAGEMENT ───
 function saveApiKey(val){
-  const k=val.trim();
-  if(k){localStorage.setItem('dexium_apikey',k);}else{localStorage.removeItem('dexium_apikey');}
+  var k=(val||""  ).trim();
+  if(k){localStorage.setItem("dexium_apikey",k);}
   checkApiKey();
 }
 function checkApiKey(){
-  const k=getApiKey();
-  const ok=document.getElementById('keyOk');
-  const miss=document.getElementById('keyMissing');
-  const inp=document.getElementById('apiKeyInput');
+  var k=getApiKey();
+  var ok=document.getElementById("keyOk");
+  var miss=document.getElementById("keyMissing");
+  var inp=document.getElementById("apiKeyInput");
   if(k){
-    if(ok){ok.style.display='';}
-    if(miss){miss.style.display='none';}
-    if(inp&&!inp.value){inp.placeholder='Clé enregistrée (sk-ant-...)';}
+    if(ok)ok.style.display="";
+    if(miss)miss.style.display="none";
+    if(inp)inp.placeholder="Clé enregistrée ✓";
   }else{
-    if(ok){ok.style.display='none';}
-    if(miss){miss.style.display='';}
+    if(ok)ok.style.display="none";
+    if(miss)miss.style.display="";
   }
 }
 checkApiKey();
+// ─── KEY INPUT EVENTS ───
+(function(){
+  function setup(){
+    var inp=document.getElementById("apiKeyInput");
+    var btn=document.getElementById("btnSaveKey");
+    if(inp){
+      inp.addEventListener("input",function(){saveApiKey(inp.value);});
+      inp.addEventListener("change",function(){saveApiKey(inp.value);});
+      inp.addEventListener("keydown",function(e){if(e.key==="Enter"){saveApiKey(inp.value);}});
+      inp.addEventListener("paste",function(){setTimeout(function(){saveApiKey(inp.value);},80);});
+    }
+    if(btn){btn.addEventListener("click",function(){saveApiKey(inp?inp.value:"");});}
+  }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",setup);}else{setup();}
+})();
 
 // ─── PILL GROUPS ───
 
