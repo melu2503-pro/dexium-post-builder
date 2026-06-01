@@ -302,6 +302,7 @@ select option{background:var(--navy2)}
   <div class="rtabs">
     <div class="rtab on" onclick="showRTab('conseils',this)">Stratégie</div>
     <div class="rtab" onclick="showRTab('historique',this)">Historique et insights</div>
+    <div class="rtab" onclick="showRTab('exemples',this)">Exemples &#10024;</div>
     </div>
   <div id="rtabConseils">
     <div class="blk">
@@ -318,6 +319,7 @@ select option{background:var(--navy2)}
     <div id="tipsArea"></div>
   </div>
   <div id="rtabHistorique" style="display:none"><div id="histArea"></div></div>
+  <div id="rtabExemples" style="display:none"><div id="exemplesArea"></div></div>
   </div>
 </div>
 </div>
@@ -504,6 +506,31 @@ const TIPS=[
   {cls:'tt-a',lbl:'Algorithme',title:'Google My Business : canal SEO local non exploité',body:'Un post GMB par semaine, reformaté depuis LinkedIn en 150 mots, améliore le référencement local pour des recherches comme IT PME Lausanne.',ex:'Objectif : apparaître dans le top 3 Google pour conciergerie IT Vaud et prestataire IT Bussigny.'},
 ];
 
+// ─── EXEMPLES DE POSTS PERFORMANTS ───
+const EXEMPLES=[
+  {
+    score:147,eng:9,label:'Partenaire Roomz — meilleur post',
+    accroche:'Roomz vient de nous confier la gestion de leur infrastructure IT. 23 collaborateurs, 3 sites, un seul interlocuteur IT.',
+    corps:'Ce qui a déclenché la décision : leur ancien prestataire mettait 4 heures à répondre en cas de panne. Leur DAF a calculé que chaque heure d'arrêt coûtait 800 CHF.\n\nDepuis 3 mois, notre temps de réponse moyen est de 18 minutes. Pas parce que nous sommes plus rapides en théorie. Parce que nous surveillons leur infrastructure 24h/24 et nous intervenons avant qu'ils appellent.\n\nUne conciergerie IT, ce n'est pas un prestataire qui répare. C'est un partenaire qui anticipe.',
+    question:'Dans votre entreprise, combien de temps s'écoule entre une panne détectée et une intervention réelle ?',
+    lecon:'Nommer un vrai client avec chiffres concrets = 5x plus d'engagement qu'un post générique.'
+  },
+  {
+    score:73,eng:10,label:'Pédagogie Managed Services',
+    accroche:'Managed Services, Infogérance, Conciergerie IT. Tout le monde utilise ces mots. Voici ce qu'ils signifient vraiment pour une PME de 30 à 150 personnes.',
+    corps:'L'infogérance classique : vous appelez quand ça plante. Le prestataire envoie quelqu'un. Vous payez à l'heure ou au forfait réactif.\n\nLe Managed Services : surveillance proactive, patchs automatiques, reporting mensuel. Vous savez ce qui se passe avant que ça plante.\n\nLa Conciergerie IT dexium : tout ça, plus un interlocuteur unique qui connaît votre métier, vos collaborateurs et vos contraintes. Un seul numéro. Une seule facture. Zéro surprise.',
+    question:'Votre contrat IT actuel inclut-il une surveillance proactive ou seulement une intervention après panne ?',
+    lecon:'Pédagogie + comparaison = 10% d'engagement. Les dirigeants adorent comprendre les nuances.'
+  },
+  {
+    score:60,eng:9,label:'Prise de position IT interne',
+    accroche:'Un responsable IT interne pour 80 collaborateurs, c'est 1 personne contre 4 priorités simultanées. Ce modèle a atteint ses limites.',
+    corps:'Sécurité, infrastructure, helpdesk, projets de transformation. En 2026, aucun profil ne peut tout maîtriser seul à un niveau acceptable.\n\nCe n'est pas une critique des IT internes. C'est un constat structurel. Les PME qui ont compris ça externalisent les niveaux 1 et 2 pour que leur IT interne se concentre sur la stratégie.\n\nRésultat observé chez nos clients : moins de tickets urgents, plus de projets livrés, une direction IT qui reprend la main sur la roadmap.',
+    question:'Dans votre PME, votre IT passe-t-il plus de temps à éteindre des incendies ou à construire quelque chose ?',
+    lecon:'Prise de position tranchée + question binaire = commentaires faciles à obtenir.'
+  }
+];
+
 // init key UI
 updateKeyUI();
 // ─── PILL GROUPS ───
@@ -535,16 +562,56 @@ function showTab(name,el){
 
 // ─── TABS DROITE ───
 function showRTab(name,el){
-  ['rtabConseils','rtabHistorique','rtabRefresh'].forEach(id=>document.getElementById(id).style.display='none');
+  ['rtabConseils','rtabHistorique','rtabExemples'].forEach(id=>{var el=document.getElementById(id);if(el)el.style.display='none';});
   document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('on'));
-  const map={conseils:'rtabConseils',historique:'rtabHistorique',refresh:'rtabRefresh'};
-  document.getElementById(map[name]).style.display='block';
+  const map={conseils:'rtabConseils',historique:'rtabHistorique',exemples:'rtabExemples'};
+  var tabEl=document.getElementById(map[name]);if(tabEl)tabEl.style.display='block';
   el.classList.add('on');
   if(name==='historique')renderHistory();
+  if(name==='exemples')renderExemples();
   if(name==='refresh')renderRefresh();
 }
 
 // ─── TIPS ───
+
+// ─── RENDER EXEMPLES ───
+function renderExemples(){
+  var area=document.getElementById('exemplesArea');
+  if(!area||area.dataset.loaded==='1')return;
+  var html2='<div class="smini" style="margin-bottom:12px">3 posts les plus performants — structure exacte</div>';
+  EXEMPLES.forEach(function(ex){
+    html2+='<div style="background:rgba(0,212,160,0.05);border:1px solid rgba(0,212,160,0.2);border-radius:10px;padding:14px 16px;margin-bottom:14px">';
+    html2+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
+    html2+='<span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#00d4a0">'+ex.score+' imp.</span>';
+    html2+='<span style="font-size:11px;color:var(--muted)">'+ex.eng+' % engagement</span>';
+    html2+='</div>';
+    html2+='<div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:10px">'+ex.label+'</div>';
+    html2+='<div style="font-size:12px;background:rgba(255,255,255,0.04);border-radius:7px;padding:10px 12px;margin-bottom:8px;line-height:1.7;color:rgba(255,255,255,0.85)">';
+    html2+='<strong style="color:#3B8BFF">Accroche :</strong> '+ex.accroche+'<br><br>';
+    html2+='<strong style="color:#3B8BFF">Corps :</strong> '+ex.corps.replace(/\n\n/g,'<br><br>')+'<br><br>';
+    html2+='<strong style="color:#3B8BFF">Question :</strong> <em>'+ex.question+'</em>';
+    html2+='</div>';
+    html2+='<div style="font-size:11px;color:var(--amber);background:rgba(245,158,11,0.08);border-radius:6px;padding:7px 10px">';
+    html2+='&#128161; '+ex.lecon;
+    html2+='</div>';
+    html2+='<button onclick="useExemple('+EXEMPLES.indexOf(ex)+')" style="margin-top:10px;font-size:12px;color:var(--cyan);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500">&#8618; Utiliser cette structure</button>';
+    html2+='</div>';
+  });
+  area.innerHTML=html2;
+  area.dataset.loaded='1';
+}
+
+function useExemple(i){
+  var ex=EXEMPLES[i];
+  if(!ex)return;
+  document.getElementById('fHook').value=ex.accroche.substring(0,120);
+  document.getElementById('ccHook').textContent=Math.min(ex.accroche.length,120)+'/120';
+  document.getElementById('fBody').value=ex.corps.substring(0,1300);
+  document.getElementById('ccBody').textContent=ex.corps.substring(0,1300).length+'/1300';
+  document.getElementById('fQuestion').value=ex.question;
+  showTab('preview',document.querySelectorAll('.tab')[0]);
+}
+
 function renderTips(){
   document.getElementById('tipsArea').innerHTML=TIPS.map(t=>`
     <div class="tip-card">
