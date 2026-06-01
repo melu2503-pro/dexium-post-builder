@@ -1436,7 +1436,7 @@ async function doAIDraft(){
   out.style.display='none';
   const srcTxt=S.sources.length?S.sources.map(s=>s.title+' ('+s.meta+')').join('\n'):'Utilise tes connaissances des PME suisses romandes en 2026.';
   const histBest=HISTORY.filter(h=>h.imp>=60).map(h=>'"'+h.label+'" ('+h.imp+' impressions, '+h.eng+' % d\'engagement)').join('\n');
-  const prompt='Tu es le fondateur de dexium (conciergerie IT PME romandes, Bussigny, Vaud).\nService : '+cfg.label+'\nFormat : '+S.fmt+'\nAccroche imposée : '+(hook||'Génère une accroche avec un chiffre réel')+'\nSources disponibles :\n'+srcTxt+'\nPosts performants :\n'+histBest+'\n\nRédige un post LinkedIn complet. Zéro tiret, zéro lien, zéro markdown, tout en français, max 270 mots.\nComplete ce JSON (continue après accroche déjà commencée) :';
+  const prompt='Tu es le fondateur de dexium (conciergerie IT PME romandes, Bussigny, Vaud).\nService : '+cfg.label+'\nFormat : '+S.fmt+'\nAccroche imposée : '+(hook||'Génère une accroche avec un chiffre réel')+'\'+'\nSources disponibles :\n'+srcTxt+'\nPosts performants :\n'+histBest+'\n\nRédige un post LinkedIn complet pour dexium. Zéro tiret, zéro lien, zéro markdown, tout en français, max 270 mots.\n\nComplète ce JSON exactement (toutes les valeurs en français) :\n{"accroche":"[1 phrase percutante max 120 chars, chiffre réel, pas Je/Nous]","corps":"[3 paragraphes de 2-3 phrases séparés par \\n\\n, angle conciergerie IT, zéro tiret]","question":"[1 seule phrase terminée par un point d'interrogation, max 25 mots]","hashtags":"'+cfg.hashtags+'"}\n\nContinue le JSON ci-dessous en commençant par la valeur de accroche :';
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',headers:getHdrs(),
@@ -1684,114 +1684,51 @@ function doPreview(){
 
 
 
-// ─── CEO REPOST ───
-
-async function genCEO(){
-
-  const btn=document.getElementById('btnGenCeo');
-
-  const bodyEl=document.getElementById('ceoBody');
-
-  if(!btn||!bodyEl)return;
-
-  btn.disabled=true;
-
-  btn.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
-
-  const hook=document.getElementById('fHook').value.trim();
-
-  const postBody=document.getElementById('fBody').value.trim();
-
-  const cfg=CFG[S.svc];
-
-
-
-  const prompt=`Tu es le fondateur de dexium (conciergerie IT PME romandes, Bussigny, Vaud).
-
-La page entreprise dexium vient de publier ce post LinkedIn :
-
-
-
-${hook}
-
-
-
-${postBody}
-
-
-
-Rédige un repost court que le fondateur publie sur son compte PERSONNEL LinkedIn pour amplifier ce post.
-
-
-
-Règles absolues :
-
-Ton personnel, direct, authentique. Pas corporate. Pas de titre.
-
-Commence par une phrase personnelle comme Ce sujet me tient à coeur depuis longtemps ou Je partage ce post parce que ou On voit ça régulièrement chez nos clients PME.
-
-Explique en 2 à 3 phrases pourquoi ce sujet est concret et important pour les PME romandes.
-
-Termine par une question courte ou une invitation à lire le post.
-
-Zéro hashtag.
-
-Zéro lien.
-
-Zéro tiret dans tout le texte.
-
-Tout en français.
-
-Entre 60 et 90 mots strictement. Compter les mots.
-
-
-
-Rédige uniquement le texte du repost, prêt à copier directement.`;
-
-
-
-  try{
-
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-
-      method:'POST',headers:getHdrs(),
-
-      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:350,messages:[{role:'user',content:prompt}]})
-
-    });
-
-    const data=await res.json();
-
-    let txt='';
-
-    if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
-
-    txt=txt.trim().replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1');
-
-    S.ceoText=txt;
-
-    bodyEl.textContent=txt;
-
-    document.getElementById('ceoCopyWrap').innerHTML=`<button class="btn-copy-pub done" id="btnCpCeo" onclick="doCopy('ceo')">Copier</button>`;
-
-    // Switch to preview tab to show result
-
-    showTab('preview',document.querySelectorAll('.tab')[0]);
-
-  }catch(e){
-
-    bodyEl.textContent='Erreur de génération. Vérifie ta connexion.';
-
-  }
-
-  btn.disabled=false;
-
-  btn.innerHTML='✦ Regénérer';
-
-}
-
-
-
+// ─── CEO REPOST ───
+async function genCEO(){
+  if(!getApiKey()){
+    alert('Clé API manquante. Colle ta clé en haut à droite.');
+    return;
+  }
+  const btn=document.getElementById('btnGenCeo');
+  const bodyEl=document.getElementById('ceoBody');
+  if(!btn||!bodyEl)return;
+  btn.disabled=true;
+  btn.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  const hook=document.getElementById('fHook').value.trim();
+  const postBody=document.getElementById('fBody').value.trim();
+  const cfg=CFG[S.svc];
+  if(!hook&&!postBody){
+    bodyEl.textContent='Génère d'abord le brouillon complet avant de créer le repost.';
+    btn.disabled=false;btn.innerHTML='✦ Générer le repost';
+    return;
+  }
+  const prompt='Tu es le fondateur de dexium (conciergerie IT PME romandes, Bussigny, Vaud).\nLa page entreprise dexium vient de publier ce post LinkedIn :\n\n'+hook+'\n\n'+postBody+'\n\nRédige un repost court que le fondateur publie sur son compte PERSONNEL LinkedIn pour amplifier ce post.\n\nRègles absolues :\nTon personnel, direct, authentique. Pas corporate.\nCommence par une phrase personnelle (ex: Ce sujet me tient à coeur, Je partage ce post parce que, On voit ça régulièrement chez nos clients PME).\nExplique en 2-3 phrases pourquoi ce sujet est concret pour les PME romandes.\nTermine par une question courte ou une invitation à lire le post.\nZéro hashtag. Zéro lien. Zéro tiret. Tout en français. Entre 60 et 90 mots strictement.\nRédige uniquement le texte du repost, prêt à copier.';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:getHdrs(),
+      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:350,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    if(data.type==='error'){
+      bodyEl.textContent='Erreur API : '+(data.error&&data.error.message||data.error&&data.error.type||'inconnue');
+      btn.disabled=false;btn.innerHTML='✦ Regénérer';
+      return;
+    }
+    let txt='';
+    if(data.content)data.content.forEach(function(b){if(b.type==='text')txt+=b.text;});
+    txt=txt.trim().replace(/[*_]{1,2}([^*_
+]+)[*_]{1,2}/g,'$1');
+    S.ceoText=txt;
+    bodyEl.textContent=txt;
+    document.getElementById('ceoCopyWrap').innerHTML='<button class="btn-copy-pub done" id="btnCpCeo" onclick="doCopy('ceo')">Copier</button>';
+    showTab('preview',document.querySelectorAll('.tab')[0]);
+  }catch(e){
+    bodyEl.textContent='Erreur réseau : '+e.message;
+  }
+  btn.disabled=false;btn.innerHTML='✦ Regénérer';
+}
+
 // ─── SCORE ───
 
 function renderScore(hook,body,question,hashtags,source){
