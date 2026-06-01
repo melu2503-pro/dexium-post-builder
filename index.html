@@ -907,15 +907,7 @@ function getHdrs(){
   };
 }
 
-function askApiKey(){
-  var k = window.prompt('Colle ta clé API Anthropic (sk-ant-api03-...)
-Obtenir une clé sur console.anthropic.com/settings/keys', '');
-  if(k && k.trim().length > 20){
-    _KEY = k.trim();
-    try { localStorage.setItem('dexium_apikey', _KEY); } catch(e) {}
-    setKeyStatus(true);
-  }
-}
+function askApiKey(){var k=window.prompt('Cle API Anthropic (sk-ant-api03-...) — console.anthropic.com/settings/keys','');if(k&&k.trim().length>20){_KEY=k.trim();try{localStorage.setItem('dexium_apikey',_KEY);}catch(e){}setKeyStatus(true);}}
 
 function setKeyStatus(active){
   var ok   = document.getElementById('keyOk');
