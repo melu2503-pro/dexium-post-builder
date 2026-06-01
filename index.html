@@ -1463,18 +1463,58 @@ async function doAIDraft(){
     let raw='';
     if(data.content)data.content.forEach(function(b){if(b.type==='text')raw+=b.text;});
     raw=raw.trim();
-    // Reconstruct full JSON (prefill was '{"accroche":"')
+
+    // Reconstruct full JSON (prefill was {"accroche":")
+
     const fullJson='{"accroche":"'+raw;
+
     let parsed=null;
-    try{parsed=JSON.parse(fullJson);}catch(e){
-      // Try adding closing brace
-      try{parsed=JSON.parse(fullJson+'}');}catch(e2){
-        // Regex find any JSON object
-        const jm=fullJson.match(/\{[\s\S]*?\}/);
-        if(jm){try{parsed=JSON.parse(jm[0]);}catch(e3){}}
-        if(!parsed){const jm2=fullJson.match(/\{[\s\S]*/);if(jm2){try{parsed=JSON.parse(jm2[0]+'}');}catch(e4){}}}
-      }
+
+    // Strategy 1: direct parse
+
+    try{parsed=JSON.parse(fullJson);}catch(e){}
+
+    // Strategy 2: add closing quote+brace
+
+    if(!parsed){try{parsed=JSON.parse(fullJson+'"}');}catch(e){}}
+
+    // Strategy 3: sanitize control chars
+
+    if(!parsed){
+
+      const s2=fullJson.replace(/[ --]/g,"");
+
+      try{parsed=JSON.parse(s2);}catch(e){}
+
+      if(!parsed){try{parsed=JSON.parse(s2+'"}'  );}catch(e){}}
+
     }
+
+    // Strategy 4: regex field extraction — always works
+
+    if(!parsed||(!parsed.corps&&!parsed.accroche)){
+
+      const rA=fullJson.match(/"accroche"\s*:\s*"([^"
+
+]{5,}?)"/);
+
+      const rC=fullJson.match(/"corps"\s*:\s*"([\s\S]{10,}?)"\s*,\s*"question"/);
+
+      const rQ=fullJson.match(/"question"\s*:\s*"([^"
+
+]{10,}?)"/);
+
+      const rT=fullJson.match(/"hashtags"\s*:\s*"([^"
+
+]{3,}?)"/);
+
+      if(rA||rC||rQ){parsed={accroche:rA?rA[1]:"",corps:rC?rC[1].replace(/\n/g,"
+
+"):"",question:rQ?rQ[1]:"",hashtags:rT?rT[1]:cfg.hashtags};}
+
+    }
+
+
     if(parsed&&(parsed.corps||parsed.accroche)){
       const acc=(parsed.accroche||'').replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').trim();
       const corps=(parsed.corps||'').replace(/[*_]{1,2}([^*_\n]+)[*_]{1,2}/g,'$1').trim();
