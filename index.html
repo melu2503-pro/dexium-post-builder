@@ -184,7 +184,7 @@ select option{background:var(--navy2)}
     <span class="logo-badge">Post Builder</span>
   </div>
   <span class="hdr-sub" id="keyMissing" onclick="askApiKey()" style="cursor:pointer;color:#ff5c5c;font-weight:600">&#9888; Cle API manquante — cliquer ici</span>
-  <span class="hdr-sub" id="keyOk" style="display:none;color:#00d4a0">&#10003; Cle API active</span>
+  <span class="hdr-sub" id="keyOk" onclick="askApiKey()" style="display:none;color:#00d4a0;cursor:pointer;text-decoration:underline" title="Cliquer pour changer la cle">&#10003; Cle API active &#9998;</span>
 </header>
 <div class="layout">
 
@@ -838,6 +838,7 @@ async function doAIDraft(){
     if(data.type==='error'){
       var msg=data.error?data.error.message:'Erreur inconnue';
       out.textContent='Erreur API : '+msg;
+      if(msg&&(msg.indexOf('invalid x-api-key')>=0||msg.indexOf('authentication')>=0)){askApiKey();}
       out.style.display='block';
       btn.disabled=false;btn.innerHTML='\u2726 Regenerer le brouillon';
       return;
