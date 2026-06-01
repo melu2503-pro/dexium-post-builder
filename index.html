@@ -1120,7 +1120,7 @@ async function doLeftIdees(){
 
       body:JSON.stringify({
 
-        model:'claude-sonnet-4-20250514',max_tokens:1400,
+        model:'claude-opus-4-5',max_tokens:1400,
 
         tools:[{type:'web_search_20250305',name:'web_search'}],
 
@@ -1284,7 +1284,7 @@ async function doSearch(){
 
       body:JSON.stringify({
 
-        model:'claude-sonnet-4-20250514',max_tokens:1300,
+        model:'claude-opus-4-5',max_tokens:1300,
 
         tools:[{type:'web_search_20250305',name:'web_search'}],
 
@@ -1441,7 +1441,7 @@ async function doAIDraft(){
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',headers:getHdrs(),
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',max_tokens:950,
+        model:'claude-opus-4-5',max_tokens:950,
         messages:[
           {role:'user',content:prompt},
           {role:'assistant',content:'{"accroche":"'}
@@ -1756,7 +1756,7 @@ Rédige uniquement le texte du repost, prêt à copier directement.`;
 
       method:'POST',headers:getHdrs(),
 
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:350,messages:[{role:'user',content:prompt}]})
+      body:JSON.stringify({model:'claude-opus-4-5',max_tokens:350,messages:[{role:'user',content:prompt}]})
 
     });
 
