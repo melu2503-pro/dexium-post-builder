@@ -326,9 +326,8 @@ select option{background:var(--navy2)}
 
   <div style="display:flex;align-items:center;gap:8px">
     <span id="keyOk" style="display:none;font-size:12px;color:#00d4a0">&#10003; Clé API active</span>
-    <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600">&#9888; Clé API manquante</span>
-    <input type="text" id="apiKeyInput" placeholder="Colle ta clé sk-ant-api03-... ici puis Entrée" autocomplete="off" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:5px 10px;color:#fff;font-family:Inter,sans-serif;font-size:12px;width:300px;outline:none" />
-
+    <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600;cursor:pointer" id="keyMissing" onclick="askApiKey()">&#9888; Clé API manquante — cliquer ici</span>
+    <button id="btnEditKey" style="background:rgba(0,212,160,0.15);border:1px solid rgba(0,212,160,0.3);border-radius:6px;padding:4px 10px;color:#00d4a0;font-size:11px;cursor:pointer;display:none" onclick="askApiKey()">&#9998; Modifier la clé</button>
   </div>
 </header>
 
@@ -896,32 +895,47 @@ const TIPS=[
 
 // ─── API KEY MANAGEMENT ───
 var _KEY = '';
-try{ _KEY = localStorage.getItem('dexium_apikey') || ''; }catch(e){}
+try { _KEY = localStorage.getItem('dexium_apikey') || ''; } catch(e) {}
 
 function getApiKey(){ return _KEY; }
-function getHdrs(){return{'Content-Type':'application/json','x-api-key':_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};}
-
-function doSaveKey(){
-  var inp = document.getElementById('apiKeyInput');
-  var v = inp ? inp.value.trim() : '';
-  if(!v) return;
-  _KEY = v;
-  try{ localStorage.setItem('dexium_apikey', v); }catch(e){}
-  var ok = document.getElementById('keyOk');
-  var miss = document.getElementById('keyMissing');
-  if(ok) ok.style.display = '';
-  if(miss) miss.style.display = 'none';
-  if(inp){ inp.value = ''; inp.placeholder = 'Clé enregistrée ✓'; }
+function getHdrs(){
+  return {
+    'Content-Type':'application/json',
+    'x-api-key': _KEY,
+    'anthropic-version':'2023-06-01',
+    'anthropic-dangerous-direct-browser-access':'true'
+  };
 }
 
-function checkApiKey(){
-  var ok = document.getElementById('keyOk');
-  var miss = document.getElementById('keyMissing');
-  if(_KEY){ if(ok)ok.style.display=''; if(miss)miss.style.display='none'; }
-  else { if(ok)ok.style.display='none'; if(miss)miss.style.display=''; }
+function askApiKey(){
+  var k = window.prompt('Colle ta clé API Anthropic ci-dessous
+(commence par sk-ant-api03-...)
+
+Obtenir une clé : console.anthropic.com/settings/keys', '');
+  if(k && k.trim().length > 20){
+    _KEY = k.trim();
+    try { localStorage.setItem('dexium_apikey', _KEY); } catch(e) {}
+    setKeyStatus(true);
+  }
 }
 
+function setKeyStatus(active){
+  var ok   = document.getElementById('keyOk');
+  var miss = document.getElementById('keyMissing');
+  var edit = document.getElementById('btnEditKey');
+  if(active){
+    if(ok)   ok.style.display   = '';
+    if(miss) miss.style.display = 'none';
+    if(edit) edit.style.display = '';
+  } else {
+    if(ok)   ok.style.display   = 'none';
+    if(miss) miss.style.display = '';
+    if(edit) edit.style.display = 'none';
+  }
+}
 
+// On page load: show status or ask for key
+if(_KEY){ setKeyStatus(true); } else { setKeyStatus(false); }
 
 // ─── PILL GROUPS ───
 
@@ -1907,41 +1921,6 @@ function doReset(){
 }
 
 
-// ─── KEY INPUT WIRING ───
-var _bk=document.getElementById('btnSaveKey');
-var _ik=document.getElementById('apiKeyInput');
-
-function doSaveKey(){
-  var v=_ik?_ik.value.trim():'';
-  if(!v||v.length<20)return;
-  _KEY=v;
-  try{localStorage.setItem('dexium_apikey',v);}catch(e){}
-  var ok=document.getElementById('keyOk');
-  var miss=document.getElementById('keyMissing');
-  if(ok){ok.style.display='';ok.textContent='✓ Clé API active';}
-  if(miss)miss.style.display='none';
-  if(_ik){_ik.style.borderColor='#00d4a0';_ik.value='';_ik.placeholder='✓ Clé enregistrée';}
-}
-
-checkApiKey();
-if(_ik){
-  // Auto-save when pasting a key (starts with sk-)
-  _ik.addEventListener('input',function(){
-    var v=this.value.trim();
-    if(v.length>30){doSaveKey();}
-  });
-  _ik.addEventListener('paste',function(){
-    var self=this;
-    setTimeout(function(){
-      var v=self.value.trim();
-      if(v.length>20){doSaveKey();}
-    },100);
-  });
-  _ik.addEventListener('keydown',function(e){
-    if(e.key==='Enter'){doSaveKey();}
-  });
-}
-if(_bk){_bk.onclick=doSaveKey;}
 
 </script>
 
