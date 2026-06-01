@@ -921,8 +921,8 @@ function checkApiKey(){
   else { if(ok)ok.style.display='none'; if(miss)miss.style.display=''; }
 }
 
-// Wire button + input after DOM is ready
-document.addEventListener('DOMContentLoaded', function(){
+// Wire button + input immediately (script is at end of body, DOM already loaded)
+(function(){
   checkApiKey();
   var inp = document.getElementById('apiKeyInput');
   var btn = document.getElementById('btnSaveKey');
@@ -932,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function(){
     inp.onpaste   = function(){ setTimeout(doSaveKey, 80); };
     inp.oninput   = function(){ if(this.value.length > 20) doSaveKey(); };
   }
-});
+})();
 
 // ─── PILL GROUPS ───
 
