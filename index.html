@@ -328,8 +328,11 @@ select option{background:var(--navy2)}
     <span id="keyOk" style="display:none;font-size:12px;color:#00d4a0">✓ Clé API active</span>
     <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600">⚠ Clé API manquante</span>
     <input type="password" id="apiKeyInput" placeholder="Colle ta clé sk-ant-api03-..." autocomplete="off"
-      style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:5px 10px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;width:240px;outline:none"
-      oninput="saveApiKey(this.value)" />
+      style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:5px 10px;color:#fff;font-family:'Inter',sans-serif;font-size:12px;width:220px;outline:none"
+      oninput="saveApiKey(this.value)" onchange="saveApiKey(this.value)"
+      onpaste="setTimeout(function(){saveApiKey(document.getElementById('apiKeyInput').value);},100)"
+      onkeydown="if(event.key==='Enter')saveApiKey(this.value)" />
+    <button onclick="saveApiKey(document.getElementById('apiKeyInput').value)" title="Enregistrer la clé" style="background:#00d4a0;border:none;border-radius:6px;padding:5px 12px;color:#0B1F3A;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px">✓</button>
   </div>
 </header>
 
