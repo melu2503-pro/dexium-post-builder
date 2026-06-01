@@ -327,8 +327,8 @@ select option{background:var(--navy2)}
   <div style="display:flex;align-items:center;gap:8px">
     <span id="keyOk" style="display:none;font-size:12px;color:#00d4a0">&#10003; Clé API active</span>
     <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600">&#9888; Clé API manquante</span>
-    <input type="password" id="apiKeyInput" placeholder="Colle ta clé sk-ant-api03-..." autocomplete="off" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:5px 10px;color:#fff;font-family:Inter,sans-serif;font-size:12px;width:220px;outline:none" />
-    <button id="btnSaveKey" style="background:#00d4a0;border:none;border-radius:6px;padding:5px 12px;color:#0B1F3A;font-size:12px;font-weight:700;cursor:pointer;margin-left:4px">&#10003; OK</button>
+    <input type="text" id="apiKeyInput" placeholder="Colle ta clé sk-ant-api03-... ici puis Entrée" autocomplete="off" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:5px 10px;color:#fff;font-family:Inter,sans-serif;font-size:12px;width:300px;outline:none" />
+
   </div>
 </header>
 
@@ -1907,28 +1907,42 @@ function doReset(){
 }
 
 
-// ─── KEY BUTTON WIRING (placed last so DOM is guaranteed ready) ───
+// ─── KEY INPUT WIRING ───
 var _bk=document.getElementById('btnSaveKey');
 var _ik=document.getElementById('apiKeyInput');
+
+function doSaveKey(){
+  var v=_ik?_ik.value.trim():'';
+  if(!v||v.length<20)return;
+  _KEY=v;
+  try{localStorage.setItem('dexium_apikey',v);}catch(e){}
+  var ok=document.getElementById('keyOk');
+  var miss=document.getElementById('keyMissing');
+  if(ok){ok.style.display='';ok.textContent='✓ Clé API active';}
+  if(miss)miss.style.display='none';
+  if(_ik){_ik.style.borderColor='#00d4a0';_ik.value='';_ik.placeholder='✓ Clé enregistrée';}
+}
+
 checkApiKey();
-if(_bk){
-  _bk.onclick=function(){
-    var k=_ik?_ik.value.trim():'';
-    if(!k){alert('Colle ta clé sk-ant-api03-... dans le champ avant de cliquer OK');return;}
-    _KEY=k;
-    try{localStorage.setItem('dexium_apikey',k);}catch(e){}
-    var ok=document.getElementById('keyOk');
-    var miss=document.getElementById('keyMissing');
-    if(ok)ok.style.display='';
-    if(miss)miss.style.display='none';
-    if(_ik){_ik.value='';_ik.placeholder='✓ Clé enregistrée';}
-    alert('✓ Clé API enregistrée ! Tu peux maintenant utiliser toutes les fonctions.');
-  };
-}
 if(_ik){
-  _ik.onpaste=function(){setTimeout(function(){if(_ik.value.length>30)_bk&&_bk.click();},150);};
-  _ik.onkeydown=function(e){if(e.key==='Enter'&&_ik.value.length>20)_bk&&_bk.click();};
+  // Auto-save when pasting a key (starts with sk-)
+  _ik.addEventListener('input',function(){
+    var v=this.value.trim();
+    if(v.length>30){doSaveKey();}
+  });
+  _ik.addEventListener('paste',function(){
+    var self=this;
+    setTimeout(function(){
+      var v=self.value.trim();
+      if(v.length>20){doSaveKey();}
+    },100);
+  });
+  _ik.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){doSaveKey();}
+  });
 }
+if(_bk){_bk.onclick=doSaveKey;}
+
 </script>
 
 </body>
