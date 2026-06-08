@@ -177,25 +177,6 @@ select option{background:var(--navy2)}
   </div>
 </div>
 
-    <div style="font-size:13px;color:#7d93b0;margin-bottom:16px;line-height:1.6">
-      Obtenir une cle : <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:#3B8BFF">console.anthropic.com/settings/keys</a><br>
-      La cle commence par <strong style="color:#fff">sk-ant-api03-</strong>
-    </div>
-    <input id="keyModalInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off"
-      style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(59,139,255,0.4);border-radius:8px;padding:10px 14px;color:#fff;font-family:'Inter',sans-serif;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:14px" />
-    <div style="display:flex;gap:10px">
-      <button id="keyModalSave"
-        style="flex:1;background:#3B8BFF;color:#fff;border:none;border-radius:8px;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer">
-        Enregistrer
-      </button>
-      <button id="keyModalCancel"
-        style="background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:10px 18px;color:#7d93b0;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer">
-        Annuler
-      </button>
-    </div>
-    <div id="keyModalError" style="display:none;margin-top:10px;font-size:12px;color:#ff5c5c"></div>
-  </div>
-</div>
 <header class="hdr">
   <div class="logo">
     <div class="logo-mark">dx</div>
@@ -394,26 +375,6 @@ document.getElementById('keyOverlay').onclick = function(e) {
 refreshKeyUI();
 if (!_KEY) { setTimeout(showKeyModal, 400); }
 
-
-var _KEY='';
-try{_KEY=localStorage.getItem('dexium_apikey')||'';}catch(e){}
-
-;}
-
-
-function saveKeyModal(){
-  var inp=document.getElementById('keyModalInput');
-  var err=document.getElementById('keyModalError');
-  var k=inp?inp.value.trim():'';
-  if(!k||k.length<20){
-    if(err){err.textContent='La cle doit commencer par sk-ant-api03- et avoir plus de 20 caracteres.';err.style.display='block';}
-    return;
-  }
-  _KEY=k;
-  try{localStorage.setItem('dexium_apikey',_KEY);}catch(e){}
-  updateKeyUI();
-  closeKeyModal();
-}
 
 const S={svc:'managed',fmt:'texte',postText:'',srcComment:'',ceoText:'',sources:[],angles:[]};
 
