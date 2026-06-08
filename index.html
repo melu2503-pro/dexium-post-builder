@@ -397,8 +397,8 @@ if (!_KEY) { setTimeout(showKeyModal, 400); }
 
 var _KEY='';
 try{_KEY=localStorage.getItem('dexium_apikey')||'';}catch(e){}
-function getApiKey(){return _KEY;}
-function getHdrs(){return{'Content-Type':'application/json','x-api-key':_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};}
+
+;}
 
 
 function saveKeyModal(){
