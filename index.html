@@ -156,8 +156,6 @@ select option{background:var(--navy2)}
 </head>
 <body>
 <style>
-#keyOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center}
-#keyOverlay:target,#keyOverlay.open{display:flex}
 .key-box{background:#0f2847;border:2px solid #3B8BFF;border-radius:14px;padding:30px;width:460px;max-width:92vw}
 .key-box h3{font-family:'Space Grotesk',sans-serif;font-size:17px;color:#fff;margin:0 0 8px}
 .key-box p{font-size:12px;color:#7d93b0;margin:0 0 14px;line-height:1.6}
@@ -166,14 +164,14 @@ select option{background:var(--navy2)}
 #btnSaveKeyFinal{background:#3B8BFF;color:#fff}
 #btnCancelKey{background:transparent;border:1px solid rgba(255,255,255,0.2)!important;color:#7d93b0;margin-top:8px}
 </style>
-<div id="keyOverlay">
+<div id="keyOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center">
   <div class="key-box">
     <h3>&#128273; Cle API Anthropic</h3>
     <p>Obtenir une cle : <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:#3B8BFF">console.anthropic.com/settings/keys</a><br>
     La cle commence par <strong style="color:#fff">sk-ant-api03-</strong></p>
     <input id="keyInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off" />
     <button id="btnSaveKeyFinal">&#10003; Enregistrer la cle</button>
-    <button id="btnCancelKey" onclick="document.getElementById('keyOverlay').classList.remove('open')">Annuler</button>
+    <button id="btnCancelKey" onclick="document.getElementById('keyOverlay').style.display='none'">Annuler</button>
   </div>
 </div>
 
@@ -383,8 +381,11 @@ function getHdrs() {
 }
 
 function showKeyModal() {
-  document.getElementById('keyOverlay').classList.add('open');
-  setTimeout(function(){ document.getElementById('keyInput').focus(); }, 50);
+  var ov = document.getElementById('keyOverlay');
+  ov.style.display = 'flex';
+  ov.style.alignItems = 'center';
+  ov.style.justifyContent = 'center';
+  setTimeout(function(){ var inp=document.getElementById('keyInput'); if(inp)inp.focus(); }, 100);
 }
 
 function saveKey() {
@@ -392,7 +393,7 @@ function saveKey() {
   if (v.length < 20) { document.getElementById('keyInput').style.borderColor = '#ff5c5c'; return; }
   _KEY = v;
   try { localStorage.setItem('dxkey', v); } catch(e) {}
-  document.getElementById('keyOverlay').classList.remove('open');
+  document.getElementById('keyOverlay').style.display='none';
   refreshKeyUI();
 }
 
@@ -407,11 +408,11 @@ function refreshKeyUI() {
 document.getElementById('btnSaveKeyFinal').onclick = saveKey;
 document.getElementById('keyInput').onkeydown = function(e) {
   if (e.key === 'Enter') saveKey();
-  if (e.key === 'Escape') document.getElementById('keyOverlay').classList.remove('open');
+  if (e.key === 'Escape') document.getElementById('keyOverlay').style.display='none';
 };
 // Close on overlay click
 document.getElementById('keyOverlay').onclick = function(e) {
-  if (e.target === this) this.classList.remove('open');
+  if (e.target === this) this.style.display='none';
 };
 
 // Init
