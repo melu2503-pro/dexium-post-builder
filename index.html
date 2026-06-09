@@ -153,37 +153,30 @@ select option{background:var(--navy2)}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
 </style>
+<style id="keyCss">
+#keyBanner{background:#0d1f3a;border-bottom:2px solid #3B8BFF;padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#keyBanner label{color:#7d93b0;font-size:13px;white-space:nowrap}
+#keyBanner input{flex:1;min-width:260px;background:rgba(255,255,255,0.07);border:1px solid rgba(59,139,255,0.5);border-radius:7px;padding:9px 13px;color:#fff;font-size:13px;outline:none;font-family:monospace}
+#keyBanner button{background:#3B8BFF;color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+#keyBanner .saved{color:#4ade80;font-size:13px;font-weight:600}
+</style>
 </head>
 <body>
-<style>
-.key-box{background:#0f2847;border:2px solid #3B8BFF;border-radius:14px;padding:30px;width:460px;max-width:92vw}
-.key-box h3{font-family:'Space Grotesk',sans-serif;font-size:17px;color:#fff;margin:0 0 8px}
-.key-box p{font-size:12px;color:#7d93b0;margin:0 0 14px;line-height:1.6}
-.key-box input{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(59,139,255,0.5);border-radius:8px;padding:11px 14px;color:#fff;font-size:13px;outline:none;margin-bottom:14px}
-.key-box button{padding:11px 0;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;width:100%}
-#btnSaveKeyFinal{background:#3B8BFF;color:#fff}
-#btnCancelKey{background:transparent;border:1px solid rgba(255,255,255,0.2)!important;color:#7d93b0;margin-top:8px}
-</style>
-<div id="keyOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center">
-  <div class="key-box">
-    <h3>&#128273; Cle API Anthropic</h3>
-    <p>Obtenir une cle : <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:#3B8BFF">console.anthropic.com/settings/keys</a><br>
-    La cle commence par <strong style="color:#fff">sk-ant-api03-</strong></p>
-    <input id="keyInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off" />
-    <button id="btnSaveKeyFinal">&#10003; Enregistrer la cle</button>
-    <button id="btnCancelKey" onclick="document.getElementById('keyOverlay').style.display='none'">Annuler</button>
-  </div>
-</div>
-
 <header class="hdr">
   <div class="logo">
     <div class="logo-mark">dx</div>
     dexium
     <span class="logo-badge">Post Builder</span>
   </div>
-  <span id="keyMissing" onclick="showKeyModal()" style="cursor:pointer;font-size:12px;color:#ff5c5c;font-weight:600">&#9888; Cle API manquante — cliquer ici</span>
+  <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600" title="Voir la banniere ci-dessous">&#9888; Cle API manquante</span>
   <span id="keyOk" onclick="showKeyModal()" style="display:none;cursor:pointer;font-size:12px;color:#00d4a0" title="Cliquer pour changer">&#10003; Cle API active &#9998;</span>
 </header>
+<div id="keyBanner">
+  <label>&#128273; Cle API Anthropic :</label>
+  <input id="keyInlineInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" />
+  <button onclick="saveKeyInline()">Enregistrer</button>
+  <span id="keyBannerStatus" class="saved" style="display:none">&#10003; Cle enregistree</span>
+</div>
 <div class="layout">
 
 <!-- GAUCHE -->
@@ -380,27 +373,46 @@ function getHdrs() {
   };
 }
 
-function showKeyModal() {
-  var ov = document.getElementById('keyOverlay');
-  ov.style.display = 'flex';
-  ov.style.alignItems = 'center';
-  ov.style.justifyContent = 'center';
-  setTimeout(function(){ var inp=document.getElementById('keyInput'); if(inp)inp.focus(); }, 100);
-}
+function showKeyModal() { /* replaced by inline banner */ refreshKeyBanner(); }
 
 function saveKey() {
   var v = document.getElementById('keyInput').value.trim();
   if (v.length < 20) { document.getElementById('keyInput').style.borderColor = '#ff5c5c'; return; }
   _KEY = v;
   try { localStorage.setItem('dxkey', v); } catch(e) {}
-  document.getElementById('keyOverlay').style.display='none';
+  refreshKeyBanner();
   refreshKeyUI();
+}
+
+function saveKeyInline() {
+  var v = document.getElementById('keyInlineInput').value.trim();
+  if (!v) { alert('Colle ta cle API (commence par sk-ant-api03-)'); return; }
+  if (!v.startsWith('sk-ant')) { alert('Format incorrect. La cle doit commencer par sk-ant-api03-'); return; }
+  localStorage.setItem('anthro_key', v);
+  _KEY = v;
+  refreshKeyUI();
+  refreshKeyBanner();
+}
+
+function refreshKeyBanner() {
+  var banner = document.getElementById('keyBanner');
+  var status = document.getElementById('keyBannerStatus');
+  var inp    = document.getElementById('keyInlineInput');
+  if (!banner) return;
+  if (_KEY) {
+    banner.style.display = 'none';
+  } else {
+    banner.style.display = 'flex';
+    if (status) status.style.display = 'none';
+    if (inp) inp.value = '';
+  }
 }
 
 function refreshKeyUI() {
   var ok   = document.getElementById('keyOk');
   var miss = document.getElementById('keyMissing');
-  if (_KEY) { if(ok) ok.style.display=''; if(miss) miss.style.display='none'; }
+  if (_KEY) { if(ok) ok.style.display=''; if(miss) miss.style.display='none';   refreshKeyBanner();
+}
   else       { if(ok) ok.style.display='none'; if(miss) miss.style.display=''; }
 }
 
@@ -408,16 +420,14 @@ function refreshKeyUI() {
 document.getElementById('btnSaveKeyFinal').onclick = saveKey;
 document.getElementById('keyInput').onkeydown = function(e) {
   if (e.key === 'Enter') saveKey();
-  if (e.key === 'Escape') document.getElementById('keyOverlay').style.display='none';
+  if (e.key === 'Escape') refreshKeyBanner();
 };
 // Close on overlay click
-document.getElementById('keyOverlay').onclick = function(e) {
-  if (e.target === this) this.style.display='none';
-};
+
 
 // Init
 refreshKeyUI();
-if (!_KEY) { setTimeout(showKeyModal, 400); }
+refreshKeyBanner();
 
 
 const S={svc:'managed',fmt:'texte',voice:'coo',pillar:'proximity',pattern:'A',postText:'',srcComment:'',ceoText:'',sources:[],angles:[]};
@@ -717,7 +727,7 @@ function initCgenPills(){
 }
 
 function doGenComment(){
-  if(!_KEY){showKeyModal();return;}
+  if(!_KEY){refreshKeyBanner();alert('Entre ta cle API dans la banniere en haut de la page.');return;}
   var src=document.getElementById('cgenSource').value.trim();
   if(src.length<20){document.getElementById('cgenSource').style.borderColor='#ff5c5c';return;}
   var btn=document.getElementById('btnGenComment');
@@ -1015,7 +1025,7 @@ function useAngle(i){
 
 // ─── AI DRAFT ───
 async function doAIDraft(){
-  if(!_KEY){showKeyModal();return;}
+  if(!_KEY){refreshKeyBanner();alert('Entre ta cle API dans la banniere en haut de la page.');return;}
   var cfg=CFG[S.svc];
   var hook=document.getElementById('fHook').value.trim();
   var btn=document.getElementById('btnAI');
