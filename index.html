@@ -558,7 +558,7 @@ const TIPS=[
   {cls:'tt-a',lbl:'Algorithme 2026',title:'Commentaires >> Likes, par une large marge',
    body:'Un commentaire multi-phrases bien formule vaut de 2 a 15x plus qu’une reaction. Le dwell time (temps de lecture) est le signal de qualite principal. Un post qu’on lit lentement bat un post qu’on survole.',
    ex:'Ecris pour qu’on lise lentement. Une idee par post. Corps court, sauts de ligne frequents, mobile-first.'},
-  {cls:'tt-c',lbl:'Ce qui marche',title:"L'accroche = 80 % du travail",
+  {cls:'tt-c',lbl:'Ce qui marche',title:"L’accroche = 80 % du travail",
    body:'La premiere ligne est la seule chose que la majorite des gens lisent avant de decider de continuer. Elle doit gagner le clic sur voir plus. Chiffre reel, declaration brutale, ou question qui cree un inconfort cognitif. Jamais Je ou Nous en premier mot.',
    ex:'[Chiffre surprenant]. Voici ce que ca change pour une PME. / On parle beaucoup de [tendance]. Personne ne dit ce que ca veut dire concretement. / [Croyance commune]. Sur le terrain, c’est l’inverse.'},
   {cls:'tt-c',lbl:'Ce qui marche',title:'POV et education = 3 a 5x plus de portee',
@@ -576,7 +576,7 @@ const TIPS=[
   {cls:'tt-t',lbl:'Playbook engagement',title:'Commenter = canal principal, pas une afterthought',
    body:'Commenter tot sur les posts de partenaires et comptes cibles est un des leviers de portee les plus puissants. Commentaire multi-phrases, reaction specifique a la ligne forte du post, un insight praticien, jamais de pitch.',
    ex:'Structure : (1) reaction a la ligne la plus forte du post, (2) un insight terrain dexium PME suisse, (3) optionnel : question legere. Zero em dash, dexium minuscules si mentionne.'},
-  {cls:'tt-d',lbl:'Piliers dexium',title:"L'espace blanc que personne n'occupe encore",
+  {cls:'tt-d',lbl:'Piliers dexium',title:"L’espace blanc que personne n’occupe encore",
    body:'ALSO, Arrow, Infomaniak, Gartner ecrivent tous pour les entreprises et les RSSI. Personne ne parle a la PME romande qui n’a pas de RSSI, pas de temps, pas d’equipe secu. C’est le terrain de dexium : pensee enterprise traduite en realite PME, dans la langue du client.',
    ex:'Mots a s’approprier : proximite et souverainete. Les grands acteurs ne peuvent pas les revendiquer crediblement au niveau PME. dexium le peut.'},
   {cls:'tt-a',lbl:'Algorithme 2026',title:'Topic authority : publier constamment sur les memes sujets',
@@ -771,8 +771,8 @@ function copyCgen(){
 function renderHistory(){
   const area=document.getElementById('histArea');
   let html=`
-    <div class="hist-ins" style="background:rgba(0,212,160,0.06);border:1px solid rgba(0,212,160,0.18)"><div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">Insight n°1 : le problème est distributional, pas éditorial</div><div style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.6">Le taux d'engagement moyen est bon à 10,5 % mais la portée s'effondre depuis mi-avril. Zéro commentaire sur 12 posts consécutifs. L'algo a stoppé la distribution. Solution : pod d'engagement de 5 personnes et questions qui forcent des réponses.</div></div>
-    <div class="hist-ins" style="background:rgba(59,139,255,0.05);border:1px solid rgba(59,139,255,0.18);margin-top:8px"><div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:4px">Insight n°2 : l'infographie avec partenaire nommé bat tout</div><div style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.6">Post Roomz partenaire nommé : 147 impressions. Post IA abstrait : 5 impressions. La combinaison infographie, sujet concret et question finale est la seule qui fonctionne de façon répétable.</div></div>
+    <div class="hist-ins" style="background:rgba(0,212,160,0.06);border:1px solid rgba(0,212,160,0.18)"><div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">Insight n°1 : le problème est distributional, pas éditorial</div><div style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.6">Le taux d’engagement moyen est bon à 10,5 % mais la portée s’effondre depuis mi-avril. Zéro commentaire sur 12 posts consécutifs. L’algo a stoppé la distribution. Solution : pod d’engagement de 5 personnes et questions qui forcent des réponses.</div></div>
+    <div class="hist-ins" style="background:rgba(59,139,255,0.05);border:1px solid rgba(59,139,255,0.18);margin-top:8px"><div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:4px">Insight n°2 : l’infographie avec partenaire nommé bat tout</div><div style="font-size:12px;color:rgba(255,255,255,0.52);line-height:1.6">Post Roomz partenaire nommé : 147 impressions. Post IA abstrait : 5 impressions. La combinaison infographie, sujet concret et question finale est la seule qui fonctionne de façon répétable.</div></div>
     <div style="font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 9px">Tous les posts de mars à mai 2026</div>`;
   HISTORY.forEach((h,i)=>{
     const tl=h.tag==='best'?'Meilleur':h.tag==='good'?'Bon':h.tag==='ok'?'Moyen':'Faible';
@@ -801,14 +801,14 @@ function reusePost(i){
   showTab('preview',document.querySelectorAll('.tab')[0]);
 }
 
-// ─── REFRESH D'IDÉES ───
+// ─── REFRESH D’IDÉES ───
 async function renderRefresh(){
   const area=document.getElementById('rtabRefresh').querySelector('#refreshArea')||document.getElementById('refreshArea');
   if(!area)return;
   if(area.dataset.loaded==='1')return;
   area.innerHTML=`<div style="text-align:center;padding:30px 0;color:var(--muted);font-size:13px">
     <div class="dots" style="justify-content:center;margin-bottom:12px"><span></span><span></span><span></span></div>
-    Recherche d'actualités fraîches en cours...
+    Recherche d’actualités fraîches en cours...
   </div>`;
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
