@@ -540,7 +540,7 @@ const EXEMPLES=[
 ]
 
 // init key UI
-updateKeyUI();
+refreshKeyUI();
 // ─── PILL GROUPS ───
 function initPills(gid,key){
   document.getElementById(gid).querySelectorAll('.pill').forEach(p=>{
@@ -878,7 +878,7 @@ function useAngle(i){
 
 // ─── AI DRAFT ───
 async function doAIDraft(){
-  if(!_KEY){askApiKey();return;}
+  if(!_KEY){showKeyModal();return;}
   var cfg=CFG[S.svc];
   var hook=document.getElementById('fHook').value.trim();
   var btn=document.getElementById('btnAI');
@@ -913,7 +913,7 @@ async function doAIDraft(){
     if(data.type==='error'){
       var msg=data.error?data.error.message:'Erreur inconnue';
       out.textContent='Erreur API : '+msg;
-      if(msg&&(msg.indexOf('invalid x-api-key')>=0||msg.indexOf('authentication')>=0)){askApiKey();}
+      if(msg&&(msg.indexOf('invalid x-api-key')>=0||msg.indexOf('authentication')>=0)){showKeyModal();}
       out.style.display='block';
       btn.disabled=false;btn.innerHTML='\u2726 Regenerer le brouillon';
       return;
