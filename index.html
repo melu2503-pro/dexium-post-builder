@@ -168,14 +168,14 @@ select option{background:var(--navy2)}
     dexium
     <span class="logo-badge">Post Builder</span>
   </div>
-  <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600" title="Voir la banniere ci-dessous">&#9888; Cle API manquante</span>
-  <span id="keyOk" onclick="showKeyModal()" style="display:none;cursor:pointer;font-size:12px;color:#00d4a0" title="Cliquer pour changer">&#10003; Cle API active &#9998;</span>
+  <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600">&#9888; Cle API manquante</span>
+  <span id="keyOk" style="display:none;cursor:pointer;font-size:12px;color:#00d4a0" title="Cliquer pour changer">&#10003; Cle API active &#9998;</span>
 </header>
 <div id="keyBanner">
-  <label>&#128273; Cle API Anthropic :</label>
+  <label for="keyInlineInput">&#128273; Cle API Anthropic :</label>
   <input id="keyInlineInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" />
-  <button onclick="saveKeyInline()">Enregistrer</button>
-  <span id="keyBannerStatus" class="saved" style="display:none">&#10003; Cle enregistree</span>
+  <button id="btnSaveKey" type="button">Enregistrer</button>
+  <span id="keyBannerStatus" style="display:none;color:#4ade80;font-size:13px;font-weight:600">&#10003; Cle enregistree</span>
 </div>
 <div class="layout">
 
@@ -238,18 +238,18 @@ select option{background:var(--navy2)}
     <div class="rbox">
       <div class="rbox-hdr">
         <span class="rbox-ttl">⏱ Recherche IA — sources et tendances</span>
-        <button class="btn-srch" id="btnSearch" onclick="doSearch()">🔍 Rechercher</button>
+        <button class="btn-srch" id="btnSearch">🔍 Rechercher</button>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.55">Actualités fraîches et chiffres réels selon le service sélectionné. Clique sur une source pour l'injecter dans l'accroche.</div>
       <div id="rboxResults"></div>
     </div>
   </div>
     <div class="blk">
-    <button class="btn-refresh" id="btnIdees" onclick="doLeftIdees()">&#128161; Nouvelles idees IA &mdash; angles et accroches</button>
+    <button class="btn-refresh" id="btnIdees">&#128161; Nouvelles idees IA &mdash; angles et accroches</button>
     <div id="leftIdeesOut" style="margin-top:8px"></div>
   </div>
 <div class="blk">
-    <button class="btn-ai" id="btnAI" onclick="doAIDraft()">✦ Générer le brouillon complet avec l'IA</button>
+    <button class="btn-ai" id="btnAI">✦ Générer le brouillon complet avec l'IA</button>
     <div class="ai-draft-out fade" id="aiDraftOut"></div>
   </div>
   <div class="blk">
@@ -293,15 +293,15 @@ select option{background:var(--navy2)}
     <input type="text" id="fSource" placeholder="Ex : https://ofcs.admin.ch/rapport-2025" />
     <div class="note">Coller uniquement l'URL complète. Elle sera proposée en bloc copiable sous le post. Ne jamais mettre de lien dans le post lui-même, pénalité algorithmique garantie.</div>
   </div>
-  <button class="btn-main" onclick="doPreview()">Générer l'aperçu et le score</button>
-  <button class="btn-ghost" onclick="doReset()">Tout réinitialiser</button>
+  <button class="btn-main">Générer l'aperçu et le score</button>
+  <button class="btn-ghost">Tout réinitialiser</button>
 </div>
 
 <!-- CENTRE -->
 <div class="mid">
   <div class="tabs">
-    <div class="tab on" onclick="showTab('preview',this)">Aperçu LinkedIn</div>
-    <div class="tab" onclick="showTab('score',this)">Score algorithmique</div>
+    <div class="tab on">Aperçu LinkedIn</div>
+    <div class="tab">Score algorithmique</div>
   </div>
   <div id="tabPreview">
     <div id="previewArea">
@@ -319,10 +319,10 @@ select option{background:var(--navy2)}
 <!-- DROITE -->
 <div class="panel" style="border-right:none">
   <div class="rtabs">
-    <div class="rtab on" onclick="showRTab('conseils',this)">Stratégie</div>
-    <div class="rtab" onclick="showRTab('historique',this)">Historique et insights</div>
-    <div class="rtab" onclick="showRTab('exemples',this)">Exemples &#10024;</div>
-    <div class="rtab" onclick="showRTab('commentaire',this)">Commentaire &#9998;</div>
+    <div class="rtab on">Stratégie</div>
+    <div class="rtab">Historique et insights</div>
+    <div class="rtab">Exemples &#10024;</div>
+    <div class="rtab">Commentaire &#9998;</div>
     </div>
   <div id="rtabConseils">
     <div class="blk">
@@ -350,9 +350,9 @@ select option{background:var(--navy2)}
       <div class="pill on" data-v="coo">Fondateur / COO</div>
       <div class="pill" data-v="anne">Anne</div>
     </div>
-    <button class="btn-ai" onclick="doGenComment()" id="btnGenComment">&#9998; Generer le commentaire</button>
+    <button class="btn-ai" id="btnGenComment">&#9998; Generer le commentaire</button>
     <div id="cgenOut" style="display:none;margin-top:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.75;white-space:pre-wrap"></div>
-    <button id="btnCopyCgen" onclick="copyCgen()" style="display:none;margin-top:8px;width:100%;background:var(--green);color:var(--navy);border:none;border-radius:7px;padding:9px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Copier le commentaire</button>
+    <button id="btnCopyCgen" style="display:none;margin-top:8px;width:100%;background:var(--green);color:var(--navy);border:none;border-radius:7px;padding:9px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Copier le commentaire</button>
   </div>
   </div>
 </div>
@@ -1357,6 +1357,68 @@ function doReset(){
   document.getElementById('scoreArea').innerHTML='<div class="li-empty">Génère d\'abord un post pour voir le score algorithmique.</div>';
   showTab('preview',document.querySelectorAll('.tab')[0]);
 }
+
+// ═══════════════════════════════════════════════════
+// Wire all interactive elements via addEventListener
+// (CSP blocks inline onclick= in HTML)
+// ═══════════════════════════════════════════════════
+(function() {
+  function wire(id, fn, evt) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener(evt || 'click', fn);
+  }
+
+  // API key banner
+  wire('btnSaveKey', function() {
+    var v = (document.getElementById('keyInlineInput').value || '').trim();
+    if (!v) { alert('Colle ta cle API Anthropic (commence par sk-ant-api03-)'); return; }
+    if (!v.startsWith('sk-ant')) { alert('Format incorrect — la cle doit commencer par sk-ant-api03-'); return; }
+    localStorage.setItem('anthro_key', v);
+    _KEY = v;
+    refreshKeyUI();
+    refreshKeyBanner();
+  });
+
+  wire('keyInlineInput', function(e) {
+    if (e.key === 'Enter') document.getElementById('btnSaveKey').click();
+  }, 'keydown');
+
+  // Tabs (right panel)
+  ['tabDraft','tabHistory','tabStrat','tabComment'].forEach(function(id) {
+    wire(id, function() { switchTab(id.replace('tab','')); });
+  });
+
+  // Copy / Generate buttons that were onclick in HTML
+  wire('btnCopy',    function() { copyPost(); });
+  wire('btnCopy2',   function() { copyPost2(); });
+  wire('btnAI',      function() { doAIDraft(); });
+  wire('btnComment', function() { doGenComment(); });
+  wire('btnRefresh', function() { doRefreshIdeas(); });
+
+  // Pill selectors (voice / pillar / pattern)
+  document.querySelectorAll('.pill[data-key]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var key = this.getAttribute('data-key');
+      var val = this.getAttribute('data-val');
+      if (!key || !val) return;
+      S[key] = val;
+      document.querySelectorAll('.pill[data-key="'+key+'"]').forEach(function(p){ p.classList.remove('active'); });
+      this.classList.add('active');
+    });
+  });
+
+  // Select dropdowns — sync to S object
+  ['selSvc','selFmt','selVoice','selPillar','selPattern'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', function() {
+      var key = id.replace('sel','').toLowerCase();
+      S[key] = this.value;
+    });
+  });
+
+  refreshKeyBanner();
+})();
 </script>
 </body>
 </html>
