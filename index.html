@@ -171,11 +171,10 @@ select option{background:var(--navy2)}
   <span id="keyMissing" style="font-size:12px;color:#ff5c5c;font-weight:600">&#9888; Cle API manquante</span>
   <span id="keyOk" style="display:none;cursor:pointer;font-size:12px;color:#00d4a0" title="Cliquer pour changer">&#10003; Cle API active &#9998;</span>
 </header>
-<div id="keyBanner">
-  <label for="keyInlineInput">&#128273; Cle API Anthropic :</label>
-  <input id="keyInlineInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" />
-  <button id="btnSaveKey" type="button">Enregistrer</button>
-  <span id="keyBannerStatus" style="display:none;color:#4ade80;font-size:13px;font-weight:600">&#10003; Cle enregistree</span>
+<div id="keyBanner" style="background:#0d1f3a;border-bottom:2px solid #3B8BFF;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+  <label for="keyInlineInput" style="color:#7d93b0;font-size:13px;white-space:nowrap">&#128273; Cle API :</label>
+  <input id="keyInlineInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:260px;background:rgba(255,255,255,0.07);border:1px solid rgba(59,139,255,0.5);border-radius:7px;padding:9px 13px;color:#fff;font-size:13px;outline:none;font-family:monospace" />
+  <span style="color:#7d93b0;font-size:12px">Lue a chaque generation — pas besoin de sauvegarder</span>
 </div>
 <div class="layout">
 
@@ -358,60 +357,50 @@ select option{background:var(--navy2)}
 </div>
 </div>
 
-<script>
+<script>function getKey() {
+  var inp = document.getElementById('keyInlineInput');
+  return inp ? inp.value.trim() : '';
+}
+
+
 // KEY MANAGEMENT
 var _KEY = '';
-try { _KEY = localStorage.getItem('dxkey') || ''; } catch(e) {}
+try { _KEY = '' || ''; } catch(e) {}
 
 function getApiKey() { return _KEY; }
 function getHdrs() {
   return {
     'Content-Type': 'application/json',
-    'x-api-key': _KEY,
+    'x-api-key': getKey(),
     'anthropic-version': '2023-06-01',
     'anthropic-dangerous-direct-browser-access': 'true'
   };
 }
 
-function showKeyModal() { /* replaced by inline banner */ refreshKeyBanner(); }
+function showKeyModal() { alert("Entre ta cle API dans le champ en haut de la page."); }
 
 function saveKey() {
   var v = document.getElementById('keyInput').value.trim();
   if (v.length < 20) { document.getElementById('keyInput').style.borderColor = '#ff5c5c'; return; }
   _KEY = v;
-  try { localStorage.setItem('dxkey', v); } catch(e) {}
-  refreshKeyBanner();
+  try { /* localStorage removed */ } catch(e) {}
+  
   refreshKeyUI();
 }
 
-function saveKeyInline() {
-  var v = document.getElementById('keyInlineInput').value.trim();
-  if (!v) { alert('Colle ta cle API (commence par sk-ant-api03-)'); return; }
   if (!v.startsWith('sk-ant')) { alert('Format incorrect. La cle doit commencer par sk-ant-api03-'); return; }
-  localStorage.setItem('anthro_key', v);
+  /* localStorage removed */
   _KEY = v;
   refreshKeyUI();
-  refreshKeyBanner();
+  
 }
 
-function refreshKeyBanner() {
-  var banner = document.getElementById('keyBanner');
-  var status = document.getElementById('keyBannerStatus');
-  var inp    = document.getElementById('keyInlineInput');
-  if (!banner) return;
-  if (_KEY) {
-    banner.style.display = 'none';
-  } else {
-    banner.style.display = 'flex';
-    if (status) status.style.display = 'none';
-    if (inp) inp.value = '';
-  }
 }
 
 function refreshKeyUI() {
   var ok   = document.getElementById('keyOk');
   var miss = document.getElementById('keyMissing');
-  if (_KEY) { if(ok) ok.style.display=''; if(miss) miss.style.display='none';   refreshKeyBanner();
+  if (getKey()) { if(ok) ok.style.display=''; if(miss) miss.style.display='none';   
 }
   else       { if(ok) ok.style.display='none'; if(miss) miss.style.display=''; }
 }
@@ -420,14 +409,14 @@ function refreshKeyUI() {
 document.getElementById('btnSaveKeyFinal').onclick = saveKey;
 document.getElementById('keyInput').onkeydown = function(e) {
   if (e.key === 'Enter') saveKey();
-  if (e.key === 'Escape') refreshKeyBanner();
+  if (e.key === 'Escape') 
 };
 // Close on overlay click
 
 
 // Init
 refreshKeyUI();
-refreshKeyBanner();
+
 
 
 const S={svc:'managed',fmt:'texte',voice:'coo',pillar:'proximity',pattern:'A',postText:'',srcComment:'',ceoText:'',sources:[],angles:[]};
@@ -727,7 +716,7 @@ function initCgenPills(){
 }
 
 function doGenComment(){
-  if(!_KEY){refreshKeyBanner();alert('Entre ta cle API dans la banniere en haut de la page.');return;}
+  if(!getKey()){alert('Entre ta cle API dans la banniere en haut de la page.');return;}
   var src=document.getElementById('cgenSource').value.trim();
   if(src.length<20){document.getElementById('cgenSource').style.borderColor='#ff5c5c';return;}
   var btn=document.getElementById('btnGenComment');
@@ -1025,7 +1014,7 @@ function useAngle(i){
 
 // ─── AI DRAFT ───
 async function doAIDraft(){
-  if(!_KEY){refreshKeyBanner();alert('Entre ta cle API dans la banniere en haut de la page.');return;}
+  if(!getKey()){alert('Entre ta cle API dans la banniere en haut de la page.');return;}
   var cfg=CFG[S.svc];
   var hook=document.getElementById('fHook').value.trim();
   var btn=document.getElementById('btnAI');
@@ -1369,19 +1358,7 @@ function doReset(){
   }
 
   // API key banner
-  wire('btnSaveKey', function() {
-    var v = (document.getElementById('keyInlineInput').value || '').trim();
-    if (!v) { alert('Colle ta cle API Anthropic (commence par sk-ant-api03-)'); return; }
-    if (!v.startsWith('sk-ant')) { alert('Format incorrect — la cle doit commencer par sk-ant-api03-'); return; }
-    localStorage.setItem('anthro_key', v);
-    _KEY = v;
-    refreshKeyUI();
-    refreshKeyBanner();
-  });
 
-  wire('keyInlineInput', function(e) {
-    if (e.key === 'Enter') document.getElementById('btnSaveKey').click();
-  }, 'keydown');
 
   // Tabs (right panel)
   ['tabDraft','tabHistory','tabStrat','tabComment'].forEach(function(id) {
@@ -1417,7 +1394,7 @@ function doReset(){
     });
   });
 
-  refreshKeyBanner();
+  
 })();
 </script>
 </body>
