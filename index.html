@@ -394,19 +394,6 @@ function refreshKeyUI() {
   if (ok)   ok.style.display   = k ? '' : 'none';
   if (miss) miss.style.display = k ? 'none' : '';
 }
-
-function refreshKeyUI() {
-  var ok   = document.getElementById('keyOk');
-  var miss = document.getElementById('keyMissing');
-  if (getKey()) { if(ok) ok.style.display=''; if(miss) miss.style.display='none';   
-}
-  else       { if(ok) ok.style.display='none'; if(miss) miss.style.display=''; }
-}
-
-// Wire save button and input Enter key
-  if (e.key === 'Enter') saveKey();
-  
-
 // Init
 refreshKeyUI();
 
