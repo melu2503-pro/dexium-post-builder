@@ -357,17 +357,16 @@ select option{background:var(--navy2)}
 </div>
 </div>
 
-<script>function getKey() {
+<script>// KEY MANAGEMENT
+var _KEY = '';
+
+function getKey() {
   var inp = document.getElementById('keyInlineInput');
   return inp ? inp.value.trim() : '';
 }
 
+function getApiKey() { return getKey(); }
 
-// KEY MANAGEMENT
-var _KEY = '';
-try { _KEY = '' || ''; } catch(e) {}
-
-function getApiKey() { return _KEY; }
 function getHdrs() {
   return {
     'Content-Type': 'application/json',
@@ -377,24 +376,23 @@ function getHdrs() {
   };
 }
 
-function showKeyModal() { alert("Entre ta cle API dans le champ en haut de la page."); }
+function showKeyModal() {
+  var banner = document.getElementById('keyBanner');
+  if (banner) { banner.scrollIntoView(); }
+  alert('Entre ta cle API dans le champ en haut de la page, puis clique Generer.');
+}
 
 function saveKey() {
-  var v = document.getElementById('keyInput').value.trim();
-  if (v.length < 20) { document.getElementById('keyInput').style.borderColor = '#ff5c5c'; return; }
-  _KEY = v;
-  try { /* localStorage removed */ } catch(e) {}
-  
+  // Legacy stub — key now read directly from #keyInlineInput
   refreshKeyUI();
 }
 
-  if (!v.startsWith('sk-ant')) { alert('Format incorrect. La cle doit commencer par sk-ant-api03-'); return; }
-  /* localStorage removed */
-  _KEY = v;
-  refreshKeyUI();
-  
-}
-
+function refreshKeyUI() {
+  var ok   = document.getElementById('keyOk');
+  var miss = document.getElementById('keyMissing');
+  var k = getKey();
+  if (ok)   ok.style.display   = k ? '' : 'none';
+  if (miss) miss.style.display = k ? 'none' : '';
 }
 
 function refreshKeyUI() {
@@ -406,13 +404,8 @@ function refreshKeyUI() {
 }
 
 // Wire save button and input Enter key
-document.getElementById('btnSaveKeyFinal').onclick = saveKey;
-document.getElementById('keyInput').onkeydown = function(e) {
   if (e.key === 'Enter') saveKey();
-  if (e.key === 'Escape') 
-};
-// Close on overlay click
-
+  
 
 // Init
 refreshKeyUI();
