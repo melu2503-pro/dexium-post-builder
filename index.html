@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- script-src keeps 'unsafe-inline': single static file, no build step, no server to issue nonces.
+     connect-src/object-src/base-uri still meaningfully cap what an XSS could reach. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.anthropic.com; object-src 'none'; base-uri 'none'; form-action 'self'">
 <title>dexium · Post Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -152,6 +155,12 @@ select option{background:var(--navy2)}
 @keyframes fup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr;height:auto}
+  .panel{border-right:none;border-bottom:1px solid var(--border);max-height:none}
+  .mid{max-height:none}
+}
+.pill[role="radio"]:focus-visible,.btn-main:focus-visible,.btn-ghost:focus-visible,.btn-ai:focus-visible,.btn-refresh:focus-visible,.btn-srch:focus-visible,.tab:focus-visible,.rtab:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 </style>
 <style id="keyCss">
 #keyBanner{background:#0d1f3a;border-bottom:2px solid #3B8BFF;padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -173,8 +182,11 @@ select option{background:var(--navy2)}
 </header>
 <div id="keyBanner" style="background:#0d1f3a;border-bottom:2px solid #3B8BFF;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
   <label for="keyInlineInput" style="color:#7d93b0;font-size:13px;white-space:nowrap">&#128273; Cle API :</label>
-  <input id="keyInlineInput" type="text" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:260px;background:rgba(255,255,255,0.07);border:1px solid rgba(59,139,255,0.5);border-radius:7px;padding:9px 13px;color:#fff;font-size:13px;outline:none;font-family:monospace" />
-  <span style="color:#7d93b0;font-size:12px">Lue a chaque generation — pas besoin de sauvegarder</span>
+  <div style="position:relative;flex:1;min-width:260px">
+    <input id="keyInlineInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false" aria-label="Cle API Anthropic" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(59,139,255,0.5);border-radius:7px;padding:9px 38px 9px 13px;color:#fff;font-size:13px;outline:none;font-family:monospace" />
+    <button id="btnToggleKey" type="button" aria-label="Afficher ou masquer la cle API" style="position:absolute;top:0;right:0;bottom:0;background:none;border:none;color:#7d93b0;cursor:pointer;font-size:14px;padding:0 11px">&#128065;</button>
+  </div>
+  <span style="color:#7d93b0;font-size:12px">Lue a chaque generation, jamais sauvegardee ni envoyee ailleurs qu'a l'API Anthropic</span>
 </div>
 <div class="layout">
 
@@ -240,16 +252,16 @@ select option{background:var(--navy2)}
         <button class="btn-srch" id="btnSearch">🔍 Rechercher</button>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.55">Actualités fraîches et chiffres réels selon le service sélectionné. Clique sur une source pour l'injecter dans l'accroche.</div>
-      <div id="rboxResults"></div>
+      <div id="rboxResults" aria-live="polite"></div>
     </div>
   </div>
     <div class="blk">
     <button class="btn-refresh" id="btnIdees">&#128161; Nouvelles idees IA &mdash; angles et accroches</button>
-    <div id="leftIdeesOut" style="margin-top:8px"></div>
+    <div id="leftIdeesOut" style="margin-top:8px" aria-live="polite"></div>
   </div>
 <div class="blk">
     <button class="btn-ai" id="btnAI">✦ Générer le brouillon complet avec l'IA</button>
-    <div class="ai-draft-out fade" id="aiDraftOut"></div>
+    <div class="ai-draft-out fade" id="aiDraftOut" aria-live="polite"></div>
   </div>
   <div class="blk">
     <div class="lbl">Accroche — 1ère ligne visible</div>
@@ -292,8 +304,8 @@ select option{background:var(--navy2)}
     <input type="text" id="fSource" placeholder="Ex : https://ofcs.admin.ch/rapport-2025" />
     <div class="note">Coller uniquement l'URL complète. Elle sera proposée en bloc copiable sous le post. Ne jamais mettre de lien dans le post lui-même, pénalité algorithmique garantie.</div>
   </div>
-  <button class="btn-main">Générer l'aperçu et le score</button>
-  <button class="btn-ghost">Tout réinitialiser</button>
+  <button class="btn-main" id="btnGenerate">Générer l'aperçu et le score</button>
+  <button class="btn-ghost" id="btnReset">Tout réinitialiser</button>
 </div>
 
 <!-- CENTRE -->
@@ -303,7 +315,7 @@ select option{background:var(--navy2)}
     <div class="tab">Score algorithmique</div>
   </div>
   <div id="tabPreview">
-    <div id="previewArea">
+    <div id="previewArea" aria-live="polite">
       <div class="li-empty">
         <svg width="46" height="46" viewBox="0 0 46 46" fill="none" style="opacity:.2;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto"><rect x="4" y="8" width="38" height="30" rx="5" stroke="white" stroke-width="1.5"/><path d="M13 19h20M13 27h13" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
         Sélectionne un service, clique <strong>Rechercher</strong> pour les sources fraîches,<br>puis <strong>Générer l'aperçu</strong>.
@@ -311,7 +323,7 @@ select option{background:var(--navy2)}
     </div>
   </div>
   <div id="tabScore" style="display:none">
-    <div id="scoreArea"><div class="li-empty">Génère d'abord un post pour voir le score algorithmique.</div></div>
+    <div id="scoreArea" aria-live="polite"><div class="li-empty">Génère d'abord un post pour voir le score algorithmique.</div></div>
   </div>
 </div>
 
@@ -350,7 +362,7 @@ select option{background:var(--navy2)}
       <div class="pill" data-v="anne">Anne</div>
     </div>
     <button class="btn-ai" id="btnGenComment">&#9998; Generer le commentaire</button>
-    <div id="cgenOut" style="display:none;margin-top:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.75;white-space:pre-wrap"></div>
+    <div id="cgenOut" aria-live="polite" style="display:none;margin-top:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.75;white-space:pre-wrap"></div>
     <button id="btnCopyCgen" style="display:none;margin-top:8px;width:100%;background:var(--green);color:var(--navy);border:none;border-radius:7px;padding:9px;font-family:"Space Grotesk",sans-serif;font-size:13px;font-weight:700;cursor:pointer">Copier le commentaire</button>
   </div>
   </div>
@@ -400,6 +412,10 @@ refreshKeyUI();
 
 
 const S={svc:'managed',fmt:'texte',voice:'coo',pillar:'proximity',pattern:'A',postText:'',srcComment:'',ceoText:'',sources:[],angles:[]};
+
+function escHtml(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
 // ─── CONFIG PAR SERVICE avec sources actualisées juin 2026 ───
 const CFG={
@@ -591,12 +607,20 @@ refreshKeyUI();
 setTimeout(renderTips,100);
 // ─── PILL GROUPS ───
 function initPills(gid,key){
-  document.getElementById(gid).querySelectorAll('.pill').forEach(p=>{
-    p.onclick=()=>{
-      document.getElementById(gid).querySelectorAll('.pill').forEach(x=>x.classList.remove('on'));
-      p.classList.add('on');S[key]=p.dataset.v;
+  const grp=document.getElementById(gid);
+  grp.setAttribute('role','radiogroup');
+  const pills=grp.querySelectorAll('.pill');
+  pills.forEach(p=>{
+    p.setAttribute('role','radio');
+    p.setAttribute('tabindex','0');
+    p.setAttribute('aria-checked',p.classList.contains('on')?'true':'false');
+    const activate=()=>{
+      pills.forEach(x=>{x.classList.remove('on');x.setAttribute('aria-checked','false');});
+      p.classList.add('on');p.setAttribute('aria-checked','true');S[key]=p.dataset.v;
       if(key==='svc'){document.getElementById('rboxResults').innerHTML='';S.sources=[];S.angles=[];}
     };
+    p.onclick=activate;
+    p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}};
   });
 }
 initPills('pgSvc','svc');initPills('pgFmt','fmt');initPills('pgVoice','voice');initPills('pgPillar','pillar');initPills('pgPattern','pattern');
@@ -625,7 +649,6 @@ function showRTab(name,el){
   el.classList.add('on');
   if(name==='historique')renderHistory();
   if(name==='exemples')renderExemples();
-  if(name==='refresh')renderRefresh();
 }
 
 // ─── TIPS ───
@@ -650,7 +673,7 @@ function renderExemples(){
     html2+='<div style="font-size:11px;color:var(--amber);background:rgba(245,158,11,0.08);border-radius:6px;padding:7px 10px">';
     html2+='&#128161; '+ex.lecon;
     html2+='</div>';
-    html2+='<button onclick="useExemple('+EXEMPLES.indexOf(ex)+')" style="margin-top:10px;font-size:12px;color:var(--cyan);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500">&#8618; Utiliser cette structure</button>';
+    html2+='<button onclick="useExemple('+EXEMPLES.indexOf(ex)+')" style="margin-top:10px;font-size:12px;color:var(--cyan);background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;font-weight:500">&#8618; Utiliser cette structure</button>';
     html2+='</div>';
   });
   area.innerHTML=html2;
@@ -686,11 +709,18 @@ var _cgenVoice='coo';
 function initCgenPills(){
   var g=document.getElementById('pgCgenVoice');
   if(!g||g.dataset.init==='1')return;
-  g.querySelectorAll('.pill').forEach(function(p){
-    p.onclick=function(){
-      g.querySelectorAll('.pill').forEach(function(x){x.classList.remove('on');});
-      p.classList.add('on');_cgenVoice=p.dataset.v;
+  g.setAttribute('role','radiogroup');
+  var pills=g.querySelectorAll('.pill');
+  pills.forEach(function(p){
+    p.setAttribute('role','radio');
+    p.setAttribute('tabindex','0');
+    p.setAttribute('aria-checked',p.classList.contains('on')?'true':'false');
+    var activate=function(){
+      pills.forEach(function(x){x.classList.remove('on');x.setAttribute('aria-checked','false');});
+      p.classList.add('on');p.setAttribute('aria-checked','true');_cgenVoice=p.dataset.v;
     };
+    p.onclick=activate;
+    p.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}};
   });
   g.dataset.init='1';
 }
@@ -781,43 +811,6 @@ function reusePost(i){
   showTab('preview',document.querySelectorAll('.tab')[0]);
 }
 
-// ─── REFRESH D’IDÉES ───
-async function renderRefresh(){
-  const area=document.getElementById('rtabRefresh').querySelector('#refreshArea')||document.getElementById('refreshArea');
-  if(!area)return;
-  if(area.dataset.loaded==='1')return;
-  area.innerHTML=`<div style="text-align:center;padding:30px 0;color:var(--muted);font-size:13px">
-    <div class="dots" style="justify-content:center;margin-bottom:12px"><span></span><span></span><span></span></div>
-    Recherche d’actualités fraîches en cours...
-  </div>`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:getHdrs(),
-      body:JSON.stringify({
-        model:'claude-opus-4-5',max_tokens:1400,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        system:`Tu es expert en veille IT pour dexium, conciergerie IT pour PME romandes suisses.
-Recherche les actualités IT les plus récentes de juin 2026 pour les PME suisses et propose 8 idées de posts LinkedIn variées couvrant : cybersécurité, cloud, workplace, GED, IA, managed services.
-Réponds UNIQUEMENT en JSON strict sans markdown :
-{"idees":[{"service":"string","angle":"string max 60 cars","accroche":"accroche LinkedIn max 120 cars sans tiret","source_titre":"string","source_url":"string https://...","pourquoi":"pourquoi ce post va performer max 80 cars"}]}`,
-        messages:[{role:'user',content:'Recherche les actualités IT les plus fraîches de mai et juin 2026 pour les PME suisses romandes. Inclus des chiffres concrets et des sources récentes. Varie les services dexium : cybersécurité, cloud, Microsoft 365, GED, IA, managed services, infrastructure hybride.'}]
-      })
-    });
-    const data=await res.json();
-    let txt='';
-    if(data.content)data.content.forEach(b=>{if(b.type==='text')txt+=b.text;});
-    txt=txt.trim().replace(/^```json?\n?/,'').replace(/```$/,'').trim();
-    let parsed=null;
-    try{parsed=JSON.parse(txt);}catch(e){}
-    if(parsed&&parsed.idees&&parsed.idees.length){
-      renderIdees(area,parsed.idees);
-    } else {
-      renderIdeesFallback(area);
-    }
-  }catch(e){renderIdeesFallback(area);}
-  area.dataset.loaded='1';
-}
-
 function renderIdees(area,idees){
   const svcColors={managed:'var(--cyan)',cloud:'#5fa3ff',workplace:'var(--green)',cyber:'var(--red)',ai:'var(--purple)',visio:'var(--amber)',ged:'#f59e0b',partner:'var(--green)'};
   let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -828,12 +821,12 @@ function renderIdees(area,idees){
     const col=svcColors[id.service]||'var(--cyan)';
     html+=`<div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:9px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:${col}18;color:${col}">${id.service||'IT'}</span>
-        <span style="font-size:12px;font-weight:600;color:var(--white)">${id.angle||''}</span>
+        <span style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:${col}18;color:${col}">${escHtml(id.service||'IT')}</span>
+        <span style="font-size:12px;font-weight:600;color:var(--white)">${escHtml(id.angle||'')}</span>
       </div>
-      <div style="font-size:13px;color:var(--green);font-weight:500;line-height:1.5;margin-bottom:6px">"${id.accroche||''}"</div>
-      ${id.source_titre?`<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Source : ${id.source_titre}</div>`:''}
-      ${id.pourquoi?`<div style="font-size:11px;color:rgba(255,255,255,0.35);font-style:italic;line-height:1.5;margin-bottom:8px">${id.pourquoi}</div>`:''}
+      <div style="font-size:13px;color:var(--green);font-weight:500;line-height:1.5;margin-bottom:6px">"${escHtml(id.accroche||'')}"</div>
+      ${id.source_titre?`<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Source : ${escHtml(id.source_titre)}</div>`:''}
+      ${id.pourquoi?`<div style="font-size:11px;color:rgba(255,255,255,0.35);font-style:italic;line-height:1.5;margin-bottom:8px">${escHtml(id.pourquoi)}</div>`:''}
       <button onclick="injecterIdee(${i})" style="font-size:12px;color:var(--cyan);background:none;border:none;cursor:pointer;padding:0;font-family:'Inter',sans-serif;font-weight:500">Injecter cette idée dans le formulaire</button>
     </div>`;
   });
@@ -856,8 +849,8 @@ function renderIdeesFallback(area){
 }
 
 function forceRefreshIdees(){
-  const area=document.getElementById('refreshArea');
-  if(area){area.dataset.loaded='0';renderRefresh();}
+  const area=document.getElementById('leftIdeesOut');
+  if(area){area.dataset.loaded='0';doLeftIdees();}
 }
 
 function injecterIdee(i){
@@ -953,11 +946,11 @@ function renderResearch(box){
   let html='<div class="divd"></div><div class="smini">Sources fraîches</div>';
   S.sources.forEach((s,i)=>{
     html+=`<div class="src-card" id="sc${i}">
-      <span class="src-tag">${s.tag||'Source'}</span>
-      <div class="src-title">${s.title}</div>
-      <div class="src-meta">${s.meta||''}</div>
-      <div class="src-hook">${s.hook||''}</div>
-      ${s.url&&s.url.startsWith('http')?`<div class="src-url">${s.url}</div>`:''}
+      <span class="src-tag">${escHtml(s.tag||'Source')}</span>
+      <div class="src-title">${escHtml(s.title)}</div>
+      <div class="src-meta">${escHtml(s.meta||'')}</div>
+      <div class="src-hook">${escHtml(s.hook||'')}</div>
+      ${s.url&&s.url.startsWith('http')?`<div class="src-url">${escHtml(s.url)}</div>`:''}
       <button class="src-btn" onclick="useSrc(${i})">Utiliser comme accroche</button>
     </div>`;
   });
@@ -965,8 +958,8 @@ function renderResearch(box){
     html+='<div class="smini" style="margin-top:11px">Angles proposés</div>';
     S.angles.forEach((a,i)=>{
       html+=`<div class="ang-card" id="ac${i}">
-        <div class="ang-title">${a.title}</div>
-        <div class="ang-hook">"${a.hook}"</div>
+        <div class="ang-title">${escHtml(a.title)}</div>
+        <div class="ang-hook">"${escHtml(a.hook)}"</div>
         <button class="ang-btn" onclick="useAngle(${i})">Utiliser cet angle</button>
       </div>`;
     });
@@ -1143,13 +1136,12 @@ function doPreview(){
   S.srcComment=cleanUrl?`Source complète :\n${cleanUrl}`:(sourceField?`Source : ${sourceField}`:'');
   S.ceoText=''; // reset on each new preview
 
-  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   let bHtml='';
-  if(hook)bHtml+=`<strong>${esc(hook)}</strong>\n\n`;
-  if(body)bHtml+=esc(body)+'\n\n';
-  if(question)bHtml+=`<em style="color:rgba(255,255,255,0.55)">${esc(question)}</em>\n\n`;
+  if(hook)bHtml+=`<strong>${escHtml(hook)}</strong>\n\n`;
+  if(body)bHtml+=escHtml(body)+'\n\n';
+  if(question)bHtml+=`<em style="color:rgba(255,255,255,0.55)">${escHtml(question)}</em>\n\n`;
   if(sourceField)bHtml+=`<span style="color:var(--muted);font-size:12px">(Source en commentaire)</span>\n\n`;
-  if(hashtags)bHtml+=`<span style="color:var(--cyan);font-size:13px">${esc(hashtags)}</span>`;
+  if(hashtags)bHtml+=`<span style="color:var(--cyan);font-size:13px">${escHtml(hashtags)}</span>`;
 
   const wc=S.postText.trim().split(/\s+/).filter(Boolean).length;
   const rt=Math.ceil(wc/200);
@@ -1176,7 +1168,7 @@ function doPreview(){
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4.5 6.5L7 9l2.5-2.5" stroke="#3B8BFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h10" stroke="#3B8BFF" stroke-width="1.3" stroke-linecap="round"/></svg>
         1er commentaire · À poster immédiatement après la publication
       </div>
-      <div class="pub-body" id="srcCommentBody">${S.srcComment?esc(S.srcComment):'<span style="color:rgba(255,255,255,0.25);font-style:italic">Aucune URL renseignée. Ajoute un lien dans le champ Source à gauche puis regénère.</span>'}</div>
+      <div class="pub-body" id="srcCommentBody">${S.srcComment?escHtml(S.srcComment):'<span style="color:rgba(255,255,255,0.25);font-style:italic">Aucune URL renseignée. Ajoute un lien dans le champ Source à gauche puis regénère.</span>'}</div>
       <div class="pub-foot">
         <span class="pub-hint">À coller en 1er commentaire immédiatement après publication. Jamais dans le post lui-même : pénalité algorithmique garantie.</span>
         ${S.srcComment?`<button class="btn-copy-pub" id="btnCpSrc" onclick="doCopy('src')">Copier</button>`:''}
@@ -1329,7 +1321,6 @@ function doReset(){
 
 // ═══════════════════════════════════════════════════
 // Wire all interactive elements via addEventListener
-// (CSP blocks inline onclick= in HTML)
 // ═══════════════════════════════════════════════════
 (function() {
   function wire(id, fn, evt) {
@@ -1338,43 +1329,33 @@ function doReset(){
   }
 
   // API key banner
+  wire('btnToggleKey', function() {
+    var inp = document.getElementById('keyInlineInput');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  });
+  wire('keyInlineInput', refreshKeyUI, 'input');
 
-
-  // Tabs (right panel)
-  ['tabDraft','tabHistory','tabStrat','tabComment'].forEach(function(id) {
-    wire(id, function() { switchTab(id.replace('tab','')); });
+  // Central tabs (Aperçu / Score)
+  document.querySelectorAll('.tab').forEach(function(t, i) {
+    t.addEventListener('click', function() { showTab(i === 0 ? 'preview' : 'score', t); });
   });
 
-  // Copy / Generate buttons that were onclick in HTML
-  wire('btnCopy',    function() { copyPost(); });
-  wire('btnCopy2',   function() { copyPost2(); });
-  wire('btnAI',      function() { doAIDraft(); });
-  wire('btnComment', function() { doGenComment(); });
-  wire('btnRefresh', function() { doRefreshIdeas(); });
-
-  // Pill selectors (voice / pillar / pattern)
-  document.querySelectorAll('.pill[data-key]').forEach(function(el) {
-    el.addEventListener('click', function() {
-      var key = this.getAttribute('data-key');
-      var val = this.getAttribute('data-val');
-      if (!key || !val) return;
-      S[key] = val;
-      document.querySelectorAll('.pill[data-key="'+key+'"]').forEach(function(p){ p.classList.remove('active'); });
-      this.classList.add('active');
-    });
+  // Right-panel tabs (Stratégie / Historique / Exemples / Commentaire)
+  var rtabNames = ['conseils', 'historique', 'exemples', 'commentaire'];
+  document.querySelectorAll('.rtab').forEach(function(t, i) {
+    t.addEventListener('click', function() { showRTab(rtabNames[i], t); });
   });
 
-  // Select dropdowns — sync to S object
-  ['selSvc','selFmt','selVoice','selPillar','selPattern'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('change', function() {
-      var key = id.replace('sel','').toLowerCase();
-      S[key] = this.value;
-    });
-  });
+  // Main actions
+  wire('btnGenerate',   doPreview);
+  wire('btnReset',      doReset);
+  wire('btnSearch',     doSearch);
+  wire('btnIdees',      doLeftIdees);
+  wire('btnAI',         doAIDraft);
+  wire('btnGenComment', doGenComment);
+  wire('btnCopyCgen',   copyCgen);
 
-  
+  initCgenPills();
 })();
 </script>
 </body>
